@@ -1,4 +1,4 @@
-name: Get Tags
+name: Generate Docker Image Tags
 description: Generate a list of Docker image tags for the current workflow.
 # The returned tags depend on the branch the workflow runs on:
 #    * If the current branch is a development branch (i.e. not master or main),
@@ -12,6 +12,13 @@ description: Generate a list of Docker image tags for the current workflow.
 #      receive the special "latest" tag that Docker uses by default. For example,
 #      a commit on branch "master" with hash "425840e" will receive the following
 #      tags: {latest, master, 425840e}
+inputs:
+  prefix:
+    description: |
+      The prefix for tagging commits that are not yet merged to main/master.
+      For example: a PR from some-branch would receive the tags <prefix>.some-branch, <prefix>.<COMMIT_SHA>.
+    required: false
+    default: dev
 
 outputs:
   tags:
@@ -46,7 +53,7 @@ runs:
         then
           TAGS="latest,$BRANCH,$COMMIT_SHA"
         else
-          TAGS="dev.$BRANCH,dev.$COMMIT_SHA"
+          TAGS="${{ inputs.prefix }}.$BRANCH,dev.$COMMIT_SHA"
         fi
 
         printf "::set-output name=tags::$TAGS"
