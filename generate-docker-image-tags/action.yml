@@ -53,7 +53,7 @@ runs:
         then
           TAGS="latest,$BRANCH,$COMMIT_SHA"
         else
-          TAGS="${{ inputs.prefix }}.$BRANCH,${{ inputs.prefx }}.$COMMIT_SHA"
+          TAGS="${{ inputs.prefix }}.$BRANCH,${{ inputs.prefix }}.$COMMIT_SHA"
         fi
 
         printf "::set-output name=tags::$TAGS"
