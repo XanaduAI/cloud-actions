@@ -1,0 +1,25 @@
+name: Push Docker Image
+description: Tags and uploads a docker image to a repository or registry.
+inputs:
+  image-id:
+    description: ID or tag of docker image
+    required: true
+  repo:
+    description: URL of target repository or registry
+    required: true
+  tags:
+    description: Comma-separated list of tags to apply to the target image
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        IFS="," read -ra DOCKER_TAGS <<< "${{ inputs.tags }}"
+        for tag in "${DOCKER_TAGS[@]}"
+        do
+          target=${{ inputs.repo }}:${tag}
+          docker tag ${{ inputs.image-id }} $target
+          docker push $target
+        done
