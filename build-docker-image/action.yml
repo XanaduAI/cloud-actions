@@ -1,0 +1,55 @@
+name: Build Docker Image
+description: Build a local Docker image using buildkit
+
+inputs:
+  path:
+    description: Path to Docker build context
+    required: true
+  target:
+    description: Docker build target
+    required: true
+  tag:
+    description: Local tag for Docker image
+    required: false
+  docker-args:
+    description: Extra arguments to docker build
+    required: false
+
+outputs:
+  image-id:
+    description: Docker image ID
+    value: ${{ steps.get-image-id.outputs.id }}
+
+runs:
+  using: composite
+  steps:
+    - name: Generate ID file path
+      id: id-file
+      shell: bash
+      run: printf "::set-output name=path::%s/iidfile_%s_$RANDOM" ${{ runner.temp }} $(date +%s)
+
+    - name: Build image
+      shell: bash
+      env:
+        DOCKER_BUILDKIT: 1
+      run: |
+        docker build \
+          --iidfile=${{ steps.id-file.outputs.path }} \
+          --target=${{ inputs.target }} \
+          --build-arg COMMIT_SHA=$(git rev-parse --short HEAD) \
+          ${{ inputs.docker-args }} ${{ inputs.path }}
+
+    - name: Get image ID
+      id: get-image-id
+      shell: bash
+      run: |
+        printf "::set-output name=id::%s" $(cat ${{ steps.id-file.outputs.path }})
+        rm -f ${{ steps.id-file.outputs.path }}
+
+    - name: Tag image
+      shell: bash
+      run: |
+        if [ -n "${{ inputs.tag }}" ]
+        then
+          docker tag ${{ steps.get-image-id.outputs.id }} ${{ inputs.tag }}
+        fi
