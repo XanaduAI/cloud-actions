@@ -35,7 +35,6 @@ runs:
       run: |
         docker build \
           --iidfile=${{ steps.id-file.outputs.path }} \
-          --ssh=default \
           --target=${{ inputs.target }} \
           --build-arg COMMIT_SHA=$(git rev-parse --short HEAD) \
           ${{ inputs.docker-args }} ${{ inputs.path }}
