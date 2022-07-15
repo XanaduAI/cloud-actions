@@ -1,0 +1,52 @@
+name: Get Tags
+description: Generate a list of Docker image tags for the current workflow.
+# The returned tags depend on the branch the workflow runs on:
+#    * If the current branch is a development branch (i.e. not master or main),
+#      the image will receive "development" tags (prefixed with "dev."). It will
+#      be tagged with both the commit hash and the branch name. For example, a
+#      commit on branch "feature-branch" with hash "425840e" will receive the
+#      following tags: {dev.feature-branch, dev.425840e}.
+#
+#    * If the current branch is master or main, the image will receive the same
+#      tags (branch and commit hash) but without the "dev." prefix. It will also
+#      receive the special "latest" tag that Docker uses by default. For example,
+#      a commit on branch "master" with hash "425840e" will receive the following
+#      tags: {latest, master, 425840e}
+
+outputs:
+  tags:
+    description: Comma-separated list of tags.
+    value: ${{ steps.get-tags.outputs.tags }}
+
+runs:
+  using: composite
+  steps:
+    - id: get-branch
+      shell: bash
+      run: |
+        if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
+        then
+          BRANCH=$GITHUB_HEAD_REF
+        elif [ "$GITHUB_EVENT_NAME" == "push" ]
+        then
+          BRANCH=${GITHUB_REF##*/}
+        else
+          printf 'Cannot determine tags: Workflow must be triggered by "push" or "pull_request" event.' && exit 1
+        fi
+
+        printf "::set-output name=branch::$BRANCH"
+
+    - id: get-tags
+      shell: bash
+      run: |
+        BRANCH=${{ steps.get-branch.outputs.branch }}
+        COMMIT_SHA=${GITHUB_SHA:0:7}
+
+        if [ "$BRANCH" == "main" ] || [ "$BRANCH" == "master" ]
+        then
+          TAGS="latest,$BRANCH,$COMMIT_SHA"
+        else
+          TAGS="dev.$BRANCH,dev.$COMMIT_SHA"
+        fi
+
+        printf "::set-output name=tags::$TAGS"
