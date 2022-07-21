@@ -1,0 +1,34 @@
+name: Restrict merging to the specified base branch only from a specified head branch
+description: A pull request can be merged only if the both the base and the head branch conform to the specified branch names.
+
+inputs:
+  head-ref-branch-name:
+    description: The name of the Head ref branch
+    required: true
+  base-ref-branch-name:
+    description: The name of the base ref branch
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
+        then
+          if [[ "$GITHUB_HEAD_REF" == "${{ inputs.head-ref-branch-name }}" ]]
+          then
+            echo "$GITHUB_HEAD_REF is ok"
+            if [[ "$GITHUB_BASE_REF" == "${{ inputs.base-ref-branch-name }}" ]]
+            then
+              echo "$GITHUB_BASE_REF is ok"
+              exit 0
+            else
+              echo "$GITHUB_BASE_REF should be ${{ inputs.base-ref-branch-name }}"
+              exit 1
+            fi
+          else
+            echo "$GITHUB_HEAD_REF should be ${{ inputs.head-ref-branch-name }}"
+            exit 1
+          fi
+        fi
