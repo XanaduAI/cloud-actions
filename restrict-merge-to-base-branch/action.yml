@@ -1,12 +1,12 @@
-name: Restrict merging to the specified base branch only from a specified head branch
-description: A pull request can be merged only if the both the base and the head branch conform to the specified branch names.
+name: Restrict merging to the specified destination branch only from a specified source branch
+description: A pull request can be merged only if the both the source and destination branches conform to the specified branch names.
 
 inputs:
-  head-ref-branch-name:
-    description: The name of the Head ref branch
+  source-branch:
+    description: The name of the source branch
     required: true
-  base-ref-branch-name:
-    description: The name of the base ref branch
+  destination-branch:
+    description: The name of the destination branch
     required: true
 
 runs:
@@ -16,19 +16,19 @@ runs:
       run: |
         if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
         then
-          if [[ "$GITHUB_HEAD_REF" == "${{ inputs.head-ref-branch-name }}" ]]
+          if [[ "$GITHUB_HEAD_REF" == "${{ inputs.source-branch }}" ]]
           then
             echo "$GITHUB_HEAD_REF is ok"
-            if [[ "$GITHUB_BASE_REF" == "${{ inputs.base-ref-branch-name }}" ]]
+            if [[ "$GITHUB_BASE_REF" == "${{ inputs.destination-branch }}" ]]
             then
               echo "$GITHUB_BASE_REF is ok"
               exit 0
             else
-              echo "$GITHUB_BASE_REF should be ${{ inputs.base-ref-branch-name }}"
+              echo "$GITHUB_BASE_REF should be ${{ inputs.destination-branch }}"
               exit 1
             fi
           else
-            echo "$GITHUB_HEAD_REF should be ${{ inputs.head-ref-branch-name }}"
+            echo "$GITHUB_HEAD_REF should be ${{ inputs.source-branch }}"
             exit 1
           fi
         fi
