@@ -18,17 +18,17 @@ runs:
         then
           if [[ "$GITHUB_HEAD_REF" == "${{ inputs.source-branch }}" ]]
           then
-            echo "$GITHUB_HEAD_REF is ok"
+            echo "Source Branch, $GITHUB_HEAD_REF is ok"
             if [[ "$GITHUB_BASE_REF" == "${{ inputs.destination-branch }}" ]]
             then
-              echo "$GITHUB_BASE_REF is ok"
+              echo "Destination branch, $GITHUB_BASE_REF is ok"
               exit 0
             else
-              echo "$GITHUB_BASE_REF should be ${{ inputs.destination-branch }}"
+              echo "Destination branch should be ${{ inputs.destination-branch }} and not $GITHUB_BASE_REF"
               exit 1
             fi
           else
-            echo "$GITHUB_HEAD_REF should be ${{ inputs.source-branch }}"
+            echo "Source branch should be ${{ inputs.source-branch }} and not $GITHUB_HEAD_REF"
             exit 1
           fi
         fi
