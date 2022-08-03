@@ -1,0 +1,32 @@
+name: Pinned Pull Request Comment
+description: Create and manage pinned comments on pull requests.
+
+inputs:
+  pull_request_number:
+    description: The pull request number on which a comment needs to be added or updated
+    required: true
+  pinned_comment_uid:
+    description: |
+      A Unique identifier to use to track a pinned comment. Can be set to an arbitrary value.
+      Use this input if you wan to manage multiple pinned comments on the same pull request.
+      Pass a different id for each of the comments you want to pin and manage.
+      Alternatively, if you want a net-new comment each time and want to disable pinning,
+      set this input to an empty string
+    required: false
+    default: default-pinned-comment
+  comment_body:
+    description: The content of the comment
+    required: true
+  github_token:
+    description: The GITHUB_TOKEN. Must have access to post comments on pull requests.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/github-script@v6
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const script = require('${{ github.action_path }}/comment.js');
+          await script({github, context}, ${{ inputs.pull_request_number }}, "${{ inputs.pinned_comment_uid }}", `${{ inputs.comment_body }}`);
