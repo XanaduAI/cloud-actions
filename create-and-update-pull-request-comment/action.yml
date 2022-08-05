@@ -1,11 +1,14 @@
-name: Pinned Pull Request Comment
-description: Create and manage pinned comments on pull requests.
+name: Create and Update Pull Request comment
+description: |
+  This actions allows the calling function to create a comment on a pull request from within GitHub Actions; and then update
+  that comment on subsequent workflow runs instead of creating a new comment each time.
+  You can also manage multiple comments using this action.
 
 inputs:
   pull_request_number:
     description: The pull request number on which a comment needs to be added or updated
     required: true
-  pinned_comment_uid:
+  comment_uid:
     description: |
       A Unique identifier to use to track a pinned comment. Can be set to an arbitrary value.
       Use this input if you wan to manage multiple pinned comments on the same pull request.
@@ -29,4 +32,4 @@ runs:
         github-token: ${{ inputs.github_token }}
         script: |
           const script = require('${{ github.action_path }}/comment.js');
-          await script({github, context}, ${{ inputs.pull_request_number }}, "${{ inputs.pinned_comment_uid }}", `${{ inputs.comment_body }}`);
+          await script({github, context}, ${{ inputs.pull_request_number }}, "${{ inputs.comment_uid }}", `${{ inputs.comment_body }}`);
