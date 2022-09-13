@@ -1,0 +1,28 @@
+name: bump
+description: ...
+
+inputs:
+  base_branch:
+    description: ...
+    required: true
+  pr_body:
+    description: ...
+    required: true
+  pr_title:
+    description: ...
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - run: python3 -m pip install semver
+      shell: bash
+
+    - run: |
+        export DEFAULT_BRANCH="${{ inputs.base_branch }}"
+        export PR_BODY="${{ inputs.pr_body }}"
+        export PR_TITLE="${{ inputs.pr_title }}"
+        python3 ./.github/workflows/tagger.py
+      shell: bash
+
