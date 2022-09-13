@@ -14,9 +14,3 @@ runs:
           docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 .
           flake8 --ignore=E203,E501,W503 .
       shell: bash
-
-    - run: ls -la
-      shell: bash
-
-    - run: tree .
-      shell: bash
