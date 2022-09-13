@@ -1,5 +1,6 @@
-name: format
-description: ...
+name: lint
+description: |
+  Run formatters/linters to OG specifications
 
 runs:
   using: "composite"
