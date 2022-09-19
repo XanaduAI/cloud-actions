@@ -1,0 +1,15 @@
+name: unit
+description: |
+  Run unit tests
+
+runs:
+  using: "composite"
+  steps:
+    - run: | 
+        pip install "./$(basename ~+ | sed 's/-/_/g')"
+        pip install pytest pytest-cov 
+      shell: bash
+
+    - run: |
+        python -m pytest --showlocals --full-trace --cov=og_example_plugin --cov-report xml:coverage.xml --cov-report term-missing --junitxml junit.xml
+      shell: bash
