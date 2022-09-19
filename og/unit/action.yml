@@ -6,7 +6,7 @@ runs:
   using: "composite"
   steps:
     - run: | 
-        pip install "./$(basename ~+ | sed 's/-/_/g')"
+        pip install .
         pip install pytest pytest-cov 
       shell: bash
 
