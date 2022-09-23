@@ -24,6 +24,6 @@ runs:
         export DEFAULT_BRANCH="${{ inputs.base_branch }}"
         export PR_BODY="${{ inputs.pr_body }}"
         export PR_TITLE="${{ inputs.pr_title }}"
-        python3 ./.github/workflows/tagger.py
+        python3 ./tagger.py
       shell: bash
 
