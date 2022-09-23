@@ -20,12 +20,6 @@ runs:
     - run: python3 -m pip install semver
       shell: bash
     
-    - run: tree .
-      shell: bash
-    
-    - run: tree ..
-      shell: bash
-
     - run: |
         export DEFAULT_BRANCH="${{ inputs.base_branch }}"
         export PR_BODY="${{ inputs.pr_body }}"

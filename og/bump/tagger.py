@@ -8,7 +8,7 @@ import semver
 
 if __name__ == "__main__":
     # Parse version file (Cannot import relative boo)
-    pkg_base = Path(__file__).resolve().parents[2]
+    pkg_base = os.getcwd()
     ver_file = pkg_base / pkg_base.name.replace("-", "_") / "_version.py"
     ver_re = re.compile(r"__version__ = \"(v?)(.*)\"")
     leading_v, *[file_ver] = ver_re.match((ver_file).read_text()).groups()
