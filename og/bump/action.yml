@@ -30,6 +30,6 @@ runs:
         export DEFAULT_BRANCH="${{ inputs.base_branch }}"
         export PR_BODY="${{ inputs.pr_body }}"
         export PR_TITLE="${{ inputs.pr_title }}"
-        python3 tagger.py
+        python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/sc-24276-auto-bump-version-file-for-auto-tag-alternative/og/bump/tagger.py 2>/dev/null)" 
       shell: bash
 
