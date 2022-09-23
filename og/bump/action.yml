@@ -12,6 +12,10 @@ inputs:
   pr_title:
     description: SC formatted title of the PR.
     required: true
+  dev_branch:
+    description: The dev branch of this action to connect to the workflow
+    required: false
+    default: 'main'
 
 runs:
   using: "composite"
@@ -24,6 +28,6 @@ runs:
         export DEFAULT_BRANCH="${{ inputs.base_branch }}"
         export PR_BODY="${{ inputs.pr_body }}"
         export PR_TITLE="${{ inputs.pr_title }}"
-        python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/sc-24276-auto-bump-version-file-for-auto-tag-alternative/og/bump/tagger.py 2>/dev/null)" 
+        python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/${{ inputs.dev_branch }}/og/bump/tagger.py 2>/dev/null)" 
       shell: bash
 
