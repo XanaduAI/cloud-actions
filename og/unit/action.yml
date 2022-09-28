@@ -13,7 +13,7 @@ runs:
     - run: | 
         eval `ssh-agent`
         echo "${{ inputs.key }}" | ssh-add -
-        pip install ./requirements.txt
+        pip install -r ./requirements.txt
         pip install pytest pytest-cov 
       shell: bash
 
