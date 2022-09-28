@@ -17,7 +17,7 @@ runs:
       shell: bash
 
     - run: | 
-        pip install .
+        pip install requirements.txt
         pip install pytest pytest-cov 
       shell: bash
 
