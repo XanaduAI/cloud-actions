@@ -12,7 +12,11 @@ description: Generate a list of Docker image tags for the current workflow.
 #      receive the special "latest" tag that Docker uses by default. For example,
 #      a commit on branch "master" with hash "425840e" will receive the following
 #      tags: {latest, master, 425840e}
+
 inputs:
+  shortcut-api-token:
+    description: Shortcut API token for fetching Story IDs related to a PR.
+    required: false
   prefix:
     description: |
       The prefix for tagging commits that are not yet merged to main/master.
@@ -54,6 +58,24 @@ runs:
           TAGS="latest,$BRANCH,$COMMIT_SHA"
         else
           TAGS="${{ inputs.prefix }}.$BRANCH,${{ inputs.prefix }}.$COMMIT_SHA"
+        fi
+
+        # Add additional tags for each Story ID associated with this PR.
+        if [ ! -z "${{ inputs.shortcut-api-token }}" ]; then
+          url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/${{ github.event.number }}"
+
+          ids=$(
+            curl --silent -X GET \
+            -H "Content-Type: application/json" \
+            -H "Shortcut-Token: ${{ inputs.shortcut-api-token }}" \
+            -d "{ \"page_size\": 20, \"query\": \"is:story and pr:$url\" }" \
+            -L "https://api.app.shortcut.com/api/v3/search" \
+            | jq ".stories.data[].id"
+          )
+
+          while read -r id; do
+            TAGS="$TAGS,sc-$id"
+          done <<< "$ids"
         fi
 
         printf "::set-output name=tags::$TAGS"
