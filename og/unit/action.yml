@@ -12,7 +12,7 @@ runs:
   steps:
     - run: |
         eval `ssh-agent`
-        echo ${{ inputs.key }} | ssh-add -
+        echo "${{ inputs.key }}" | ssh-add -
       shell: bash
 
     - run: | 
