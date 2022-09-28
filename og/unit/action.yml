@@ -10,13 +10,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: |
+    - run: | 
         eval `ssh-agent`
         echo "${{ inputs.key }}" | ssh-add -
-        ssh -T git@github.com
-      shell: bash
-
-    - run: | 
         pip install ./requirements.txt
         pip install pytest pytest-cov 
       shell: bash
