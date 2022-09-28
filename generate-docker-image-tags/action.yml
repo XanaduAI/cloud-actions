@@ -78,5 +78,4 @@ runs:
           done <<< "$ids"
         fi
 
-        echo "Using tags: $TAGS"
         printf "::set-output name=tags::$TAGS"
