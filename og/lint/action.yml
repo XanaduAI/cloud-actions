@@ -1,0 +1,17 @@
+name: lint
+description: |
+  Run formatters/linters to OG specifications
+
+runs:
+  using: "composite"
+  steps:
+    - run: | 
+          pip install black isort docformatter flake8
+      shell: bash
+
+    - run: |
+          black .
+          isort --profile=black .
+          docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 .
+          flake8 --ignore=E203,E501,W503 .
+      shell: bash
