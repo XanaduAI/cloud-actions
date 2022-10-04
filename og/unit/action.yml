@@ -1,6 +1,5 @@
 name: unit
-description: |
-  Run unit tests
+description: Run unit tests
 
 inputs:
   key:
