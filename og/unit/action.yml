@@ -5,6 +5,10 @@ inputs:
   key:
     description: QUBOT SSH Key
     required: true
+  path:
+    description: The path for unit tests
+    required: false
+    default: '.'
 
 runs:
   using: "composite"
@@ -17,5 +21,5 @@ runs:
       shell: bash
 
     - run: |
-        python -m pytest --showlocals --full-trace --cov=og_example_plugin --cov-report xml:coverage.xml --cov-report term-missing --junitxml junit.xml
+        python -m pytest ${{ inputs.path }} --showlocals --full-trace --cov="$(${GITHUB.repository}|sed 's/-/_/')" --cov-report xml:coverage.xml --cov-report term-missing --junitxml junit.xml
       shell: bash
