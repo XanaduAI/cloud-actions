@@ -11,7 +11,7 @@ if __name__ == "__main__":
     pkg_base = Path(os.getcwd())
     ver_file = pkg_base / pkg_base.name.replace("-", "_") / "_version.py"
     ver_re = re.compile(r".*__version__ = \"(v?)(.*)\"")
-    leading_v, *[file_ver] = ver_re.match((ver_file).read_text()).groups()
+    leading_v, *[file_ver] = ver_re.match((ver_file).read_text().replace('\n', ' ')).groups()
 
     subprocess_kwargs = {
         "encoding": "utf-8",
