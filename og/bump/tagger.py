@@ -27,7 +27,7 @@ if __name__ == "__main__":
         subprocess.run(
             f"git show {default_branch}:{pkg_base.name.replace('-', '_')}/_version.py",
             **subprocess_kwargs,
-        ).stdout,
+        ).stdout.replace('\n', ' '),
     ).groups()
     # If version not updated in file
     if semver.compare(default_branch_ver, file_ver) != -1:
