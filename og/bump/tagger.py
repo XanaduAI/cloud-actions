@@ -23,12 +23,6 @@ if __name__ == "__main__":
     default_branch = os.environ["DEFAULT_BRANCH"]
     print("Default branch is detected as: ", default_branch)
     # Get current version from _version.py on the default branch.
-    print(
-        subprocess.run(
-            f"git show {default_branch}:{pkg_base.name.replace('-', '_')}/_version.py",
-            **subprocess_kwargs,
-        ).stdout.replace('\n', ' ')
-    )
     _, *[default_branch_ver] = ver_re.match(
         subprocess.run(
             f"git show {default_branch}:{pkg_base.name.replace('-', '_')}/_version.py",
