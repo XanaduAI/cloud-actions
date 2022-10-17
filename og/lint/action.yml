@@ -17,9 +17,9 @@ runs:
     - run: |
           MODIFIED_PY_FILES="$(git diff ${{ inputs.base_branch }} --diff-filter=MAC --name-only | grep -i '\.py$' | sed -z 's/\n/ /g' || true)"
           if [ -n "${MODIFIED_PY_FILES}" ]; then \
-            black "${MODIFIED_PY_FILES}" ; \
-            isort --profile=black "${MODIFIED_PY_FILES}" ; \
-            docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 "${MODIFIED_PY_FILES}" ; \
-            flake8 --ignore=E203,E501,W503 "${MODIFIED_PY_FILES}" ; \
+            black ${MODIFIED_PY_FILES} ; \
+            isort --profile=black ${MODIFIED_PY_FILES} ; \
+            docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 ${MODIFIED_PY_FILES} ; \
+            flake8 --ignore=E203,E501,W503 ${MODIFIED_PY_FILES} ; \
           fi
       shell: bash
