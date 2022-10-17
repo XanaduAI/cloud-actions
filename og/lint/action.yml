@@ -2,6 +2,11 @@ name: lint
 description: |
   Run formatters/linters to OG specifications
 
+inputs:
+  base_branch:
+    description: The base branch of the PR.
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -10,7 +15,8 @@ runs:
       shell: bash
 
     - run: |
-          MODIFIED_PY_FILES="$(git diff `git rev-parse --abbrev-ref origin/HEAD` --diff-filter=MAC --name-only | grep -i '\.py$' || true)"
+          git fetch --all
+          MODIFIED_PY_FILES="$(git diff ${{ inputs.base_branch }} --diff-filter=MAC --name-only | grep -i '\.py$' || true)"
           if [ -n "${MODIFIED_PY_FILES}" ]; then \
             black "${MODIFIED_PY_FILES}" ; \
             isort --profile=black "${MODIFIED_PY_FILES}" ; \
