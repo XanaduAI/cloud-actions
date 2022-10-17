@@ -11,7 +11,7 @@ runs:
 
     - run: |
           MODIFIED_PY_FILES="$(git diff --diff-filter=MAC --name-only | grep -i '\.py$' || true)"
-          if [ -n "${MODIFIED_PY_FILES}"]; then \
+          if [ -n "${MODIFIED_PY_FILES}" ]; then \
             black "${MODIFIED_PY_FILES}" ; \
             isort --profile=black "${MODIFIED_PY_FILES}" ; \
             docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 "${MODIFIED_PY_FILES}" ; \
