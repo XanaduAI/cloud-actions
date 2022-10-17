@@ -2,6 +2,11 @@ name: lint
 description: |
   Run formatters/linters to OG specifications
 
+inputs:
+  base_branch:
+    description: The base branch of the PR.
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -10,8 +15,11 @@ runs:
       shell: bash
 
     - run: |
-          black .
-          isort --profile=black .
-          docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 .
-          flake8 --ignore=E203,E501,W503 .
+          MODIFIED_PY_FILES="$(git diff ${{ inputs.base_branch }} --diff-filter=MAC --name-only | grep -i '\.py$' | sed -z 's/\n/ /g' || true)"
+          if [ -n "${MODIFIED_PY_FILES}" ]; then \
+            black ${MODIFIED_PY_FILES} ; \
+            isort --profile=black ${MODIFIED_PY_FILES} ; \
+            docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 ${MODIFIED_PY_FILES} ; \
+            flake8 --ignore=E203,E501,W503 ${MODIFIED_PY_FILES} ; \
+          fi
       shell: bash

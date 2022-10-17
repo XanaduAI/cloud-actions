@@ -10,8 +10,8 @@ if __name__ == "__main__":
     # Parse version file (Cannot import relative boo)
     pkg_base = Path(os.getcwd())
     ver_file = pkg_base / pkg_base.name.replace("-", "_") / "_version.py"
-    ver_re = re.compile(r"__version__ = \"(v?)(.*)\"")
-    leading_v, *[file_ver] = ver_re.match((ver_file).read_text()).groups()
+    ver_re = re.compile(r".*__version__ = \"(v?)(.*)\"")
+    leading_v, *[file_ver] = ver_re.match((ver_file).read_text().replace('\n', ' ')).groups()
 
     subprocess_kwargs = {
         "encoding": "utf-8",
@@ -27,7 +27,7 @@ if __name__ == "__main__":
         subprocess.run(
             f"git show {default_branch}:{pkg_base.name.replace('-', '_')}/_version.py",
             **subprocess_kwargs,
-        ).stdout,
+        ).stdout.replace('\n', ' '),
     ).groups()
     # If version not updated in file
     if semver.compare(default_branch_ver, file_ver) != -1:
