@@ -1,15 +1,17 @@
 name: Build Docker Images
-description: Builds multiple Docker images in parallel (using BuildKit).
+description: >
+  Builds multiple Docker images in parallel (with BuildKit enabled).
+  Each Docker image will be tagged with the name of its target.
 
 inputs:
   path:
-    description: Docker build context path (e.g., "."").
+    description: Docker build context path (e.g., ".").
     required: true
   targets:
     description: Docker build targets as a space-separated list (e.g., "daemon server").
     required: true
   docker-build-extra-args:
-    description: Docker build extra arguments (e.g., "ssh=default").
+    description: Docker build extra arguments.
     required: false
 
 runs:

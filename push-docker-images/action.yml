@@ -3,7 +3,9 @@ description: Pushes multiple Docker images in parallel.
 
 inputs:
   images:
-    description: Docker images to push as a space-separated list (local tags or IDs).
+    description: >
+      Docker images to push (local tags or IDs) as a space-separated list.
+      The number of images must match the number of repositories.
     required: true
   repos:
     description: >
@@ -21,7 +23,12 @@ runs:
       run: |
         read -ra images <<< "${{ inputs.images }}"
         read -ra repos <<< "${{ inputs.repos }}"
-        ITF="," read -ra tags <<< "${{ inputs.tags }}"
+        IFS="," read -ra tags <<< "${{ inputs.tags }}"
+
+        if [ "${#images[@]}" -ne "${#repos[@]}" ]; then
+          echo "Number of images must match the number of repositories."
+          exit 1
+        fi
 
         for i in "${!images[@]}"; do
           for tag in "${tags[@]}"; do
