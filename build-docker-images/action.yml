@@ -22,8 +22,8 @@ runs:
             docker build \
               --build-arg COMMIT_SHA=${{ github.sha }} \
               --ssh default \
-              --tag target \
-              --target target \
+              --tag $target \
+              --target $target \
               ${{ inputs.docker-build-extra-args }} \
               . &
         done
