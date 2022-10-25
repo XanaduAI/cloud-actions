@@ -37,7 +37,7 @@ runs:
             target="${repo}:${tag}"
 
             docker tag $image $target
-            docker push $target & .
+            docker push $target &
           done
         done
 
