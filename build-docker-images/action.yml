@@ -1,0 +1,31 @@
+name: Build Docker Images
+description: Builds multiple Docker images in parallel (using BuildKit).
+
+inputs:
+  path:
+    description: Docker build context path (e.g., "."").
+    required: true
+  targets:
+    description: Docker build targets as a space-separated list (e.g., "daemon server").
+    required: true
+  docker-build-extra-args:
+    description: Docker build extra arguments (e.g., "ssh=default").
+    required: false
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        for target in ${{ inputs.targets }}; do
+          DOCKER_BUILDKIT=1 \
+            docker build \
+              --build-arg COMMIT_SHA=${{ github.sha }} \
+              --ssh default \
+              --tag target \
+              --target target \
+              ${{ inputs.docker-build-extra-args }} \
+              . &
+        done
+
+        wait

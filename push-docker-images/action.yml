@@ -1,0 +1,37 @@
+name: Push Docker Images
+description: Pushes multiple Docker images in parallel.
+
+inputs:
+  images:
+    description: Docker images to push as a space-separated list (local tags or IDs).
+    required: true
+  repos:
+    description: >
+      Docker image repositories (to push the images to) as a space-separated list.
+      The number of repositories must match the number of images.
+    required: true
+  tags:
+    description: Tags to apply to the pushed Docker images as a comma-separated list.
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      run: |
+        read -ra images <<< "${{ inputs.images }}"
+        read -ra repos <<< "${{ inputs.repos }}"
+        ITF="," read -ra tags <<< "${{ inputs.tags }}"
+
+        for i in "${!images[@]}"; do
+          for tag in "${tags[@]}"; do
+            image="${images[$i]}"
+            repo="${repos[$i]}"
+            target="${repo}:${tag}"
+
+            docker tag $image $target
+            docker push $target & .
+          done
+        done
+
+        wait
