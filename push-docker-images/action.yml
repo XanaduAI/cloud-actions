@@ -31,14 +31,14 @@ runs:
         fi
 
         for i in "${!images[@]}"; do
-          for tag in "${tags[@]}"; do
-            image="${images[$i]}"
-            repo="${repos[$i]}"
-            target="${repo}:${tag}"
+          image="${images[$i]}"
+          repo="${repos[$i]}"
 
-            docker tag $image $target
-            docker push $target &
+          for tag in "${tags[@]}"; do
+            docker tag $image $repo:$tag
           done
+
+          docker push --all-tags $repo &
         done
 
         wait
