@@ -26,7 +26,7 @@ if __name__ == "__main__":
         subprocess.run(
             f"git show {default_branch}:{ver_file}",
             **subprocess_kwargs,
-        ).stdout.replace('\n', ' '),
+        ).stdout.replace('\n', ' ') or "v0.0.0",
     ).groups()
     # If version not updated in file
     if semver.compare(default_branch_ver, file_ver) != -1:
