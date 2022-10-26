@@ -8,7 +8,8 @@ import semver
 
 if __name__ == "__main__":
     # Parse version file (Cannot import relative boo)
-    ver_file, *_ = [*Path(os.getcwd()).glob('**/_version.py')]
+    pkg_base = Path(os.getcwd())
+    ver_file, *_ = [*pkg_base.glob('**/_version.py')]
     ver_re = re.compile(r".*__version__ = [\"\'](v?)(.*)[\"\']")
     leading_v, *[file_ver] = ver_re.match((ver_file).read_text().replace('\n', ' ')).groups()
 
@@ -24,7 +25,7 @@ if __name__ == "__main__":
     # Get current version from _version.py on the default branch.
     _, *[default_branch_ver] = ver_re.match(
         subprocess.run(
-            f"git show {default_branch}:{ver_file}",
+            f"git show {default_branch}:{ver_file.relative_to(pkg_base)}",
             **subprocess_kwargs,
         ).stdout.replace('\n', '') or '__version__ = "v0.0.0"',
     ).groups()
