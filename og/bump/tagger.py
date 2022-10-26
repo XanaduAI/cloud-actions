@@ -8,9 +8,8 @@ import semver
 
 if __name__ == "__main__":
     # Parse version file (Cannot import relative boo)
-    pkg_base = Path(os.getcwd())
-    ver_file, *_ = [*pkg_base.glob('**/_version.py')]
-    ver_re = re.compile(r".*__version__ = \"(v?)(.*)\"")
+    ver_file, *_ = [*Path(os.getcwd()).glob('**/_version.py')]
+    ver_re = re.compile(r".*__version__ = [\"\'](v?)(.*)[\"\']")
     leading_v, *[file_ver] = ver_re.match((ver_file).read_text().replace('\n', ' ')).groups()
 
     subprocess_kwargs = {
