@@ -35,7 +35,7 @@ runs:
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         pull-request-number: github.event.number
       run: |
-        ls -al ${{ inputs.s3-bucket }}/
+        ls -al ${{ inputs.build-directory }}/
       # run: echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/
 
     - name: On Pull Request update push the changed files to the existing folder
