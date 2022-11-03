@@ -7,12 +7,12 @@ inputs:
   s3-bucket:
     description: The name of the S3 bucket
     required: true
-  # pull-request-number:
-  #   description: The Pull request number in a <PR-123> format. This will also be the name of the folder to push contents to/delete on S3.
-  #   required: false
-  # cloudfront-distribution-id:
-  #   description: The cloudfront distribution ID for the app
-  #   required: false
+  pull-request-number:
+    description: The Pull request number in a <PR-123> format. This will also be the name of the folder to push contents to/delete on S3.
+    required: false
+  cloudfront-distribution-id:
+    description: The cloudfront distribution ID for the app
+    required: false
   # aws-region:
   #   description: The aws region used by the IAM machine user
   #   required: true
@@ -32,28 +32,48 @@ runs:
   steps:
     - name: On Pull Request creation push the built files to a new folder
       shell: bash
+      if: github.event_name == 'pull_request' && github.event.action == 'opened'
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
-      # if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.event.type == 'opened'
-      run: echo $GITHUB_CONTEXT
+        pull-request-number: github.event.number
+      run: |
+        echo "1"
+   #     echo $GITHUB_CONTEXT
+      # run: echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/
 
-
-
-      #   if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
-      #   then
-      #     if [[ "$GITHUB_HEAD_REF" == "${{ inputs.source-branch }}" ]]
-      #     then
-      #       echo "Source Branch, $GITHUB_HEAD_REF is ok"
-      #       if [[ "$GITHUB_BASE_REF" == "${{ inputs.destination-branch }}" ]]
-      #       then
-      #         echo "Destination branch, $GITHUB_BASE_REF is ok"
-      #         exit 0
-      #       else
-      #         echo "Destination branch should be ${{ inputs.destination-branch }} and not $GITHUB_BASE_REF"
-      #         exit 1
-      #       fi
-      #     else
-      #       echo "Source branch should be ${{ inputs.source-branch }} and not $GITHUB_HEAD_REF"
-      #       exit 1
-      #     fi
-      #   fi
+    - name: On Pull Request update push the changed files to the existing folder
+      shell: bash
+      if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+        pull-request-number: github.event.number
+      run: |
+        echo "2"
+  #      echo $GITHUB_CONTEXT
+      # run: |
+      #   echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --delete
+      #   echo aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront-distribution-id }} --paths "/PR-$pull-request-number/*"
+      
+    - name: Delete the folder on S3 when a PR is closed without merging
+      shell: bash
+      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+        pull-request-number: github.event.number
+      run: |
+        echo "3"
+ #       echo $GITHUB_CONTEXT
+      # run: echo aws s3 rm s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --recursive
+      
+    - name: When a PR is merged to main update the root folder of the S3 bucket
+      shell: bash
+      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.base_ref == 'main'
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+        pull-request-number: github.event.number
+      run: |
+        echo "4"
+#        echo $GITHUB_CONTEXT
+      # run: |
+        # echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/ --delete --exclude "PR-[0-9]*"
+        # echo aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront-distribution-id }} --paths "/*"
