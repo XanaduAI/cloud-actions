@@ -33,8 +33,12 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        pull-request-number: ${{ github.event.number }}
-      run: aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/
+        prno: ${{ github.event.number }}
+        GITHUB_CONTEXT:  ${{ toJson(github) }}
+      run: |
+        echo $prno
+        echo $GITHUB_CONTEXT
+      # aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$prno/
 
     - name: On Pull Request update push the changed files to the existing folder
       shell: bash
@@ -43,10 +47,10 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        pull-request-number: ${{ github.event.number }}
+        prno: ${{ github.event.number }}
       run: |
-        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --delete
-        aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/PR-$pull-request-number/*"
+        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$prno/ --delete
+        aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/PR-$prno/*"
       
     - name: Delete the folder on S3 when a PR is closed without merging
       shell: bash
@@ -55,8 +59,8 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        pull-request-number: ${{ github.event.number }}
-      run: aws s3 rm s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --recursive
+        prno: ${{ github.event.number }}
+      run: aws s3 rm s3://${{ inputs.s3-bucket }}/PR-$prno/ --recursive
       
     - name: When a PR is merged to main update the root folder of the S3 bucket
       shell: bash
@@ -65,7 +69,7 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        pull-request-number: ${{ github.event.number }}
+        prno: ${{ github.event.number }}
       run: |
         aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/ --delete --exclude "PR-[0-9]*"
         aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/*"
