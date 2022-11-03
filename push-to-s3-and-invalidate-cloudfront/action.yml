@@ -7,25 +7,21 @@ inputs:
   s3-bucket:
     description: The name of the S3 bucket
     required: true
-  pull-request-number:
-    description: The Pull request number in a <PR-123> format. This will also be the name of the folder to push contents to/delete on S3.
-    required: false
-  cloudfront-distribution-id:
+  build-directory:
+    description: The directory that contains the build files to upload to S3
+    required: true
+  aws-cloudfront-distribution-id:
     description: The cloudfront distribution ID for the app
-    required: false
-  # aws-region:
-  #   description: The aws region used by the IAM machine user
-  #   required: true
-  # aws-access-key-id:
-  #   description: The aws access key id for the IAM machine user
-  #   required:  true
-  # aws-secret-access-key:
-  #   description: The aws secret access key for the IAM machine user
-  #   required:  true
-    
-  # pr-activity-type:
-  #   description: The type of activity for the pull request. Common activity types are a pull request being opened or merged. Full list of activity types can be found here - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
-  #   required: true
+    required: true
+  aws-region:
+    description: The aws region used by the IAM machine user
+    required: true
+  aws-access-key-id:
+    description: The aws access key id for the IAM machine user
+    required:  true
+  aws-secret-access-key:
+    description: The aws secret access key for the IAM machine user
+    required:  true
 
 runs:
   using: composite
@@ -34,46 +30,50 @@ runs:
       shell: bash
       if: github.event_name == 'pull_request' && github.event.action == 'opened'
       env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
+        AWS_REGION: ${{ inputs.aws-region }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         pull-request-number: github.event.number
       run: |
-        echo "1"
-   #     echo $GITHUB_CONTEXT
+        ls -al ${{ inputs.s3-bucket }}/
       # run: echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/
 
     - name: On Pull Request update push the changed files to the existing folder
       shell: bash
       if: github.event_name == 'pull_request' && github.event.action == 'synchronize'
       env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
+        AWS_REGION: ${{ inputs.aws-region }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         pull-request-number: github.event.number
-      run: |
-        echo "2"
-  #      echo $GITHUB_CONTEXT
       # run: |
-      #   echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --delete
-      #   echo aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront-distribution-id }} --paths "/PR-$pull-request-number/*"
+      #   echo "2"
+      run: |
+        echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --delete
+        echo aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/PR-$pull-request-number/*"
       
     - name: Delete the folder on S3 when a PR is closed without merging
       shell: bash
       if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == false
       env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
+        AWS_REGION: ${{ inputs.aws-region }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         pull-request-number: github.event.number
-      run: |
-        echo "3"
- #       echo $GITHUB_CONTEXT
-      # run: echo aws s3 rm s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --recursive
+      # run: |
+      #   echo "3"
+      run: echo aws s3 rm s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --recursive
       
     - name: When a PR is merged to main update the root folder of the S3 bucket
       shell: bash
       if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.base_ref == 'main'
       env:
-        GITHUB_CONTEXT: ${{ toJson(github) }}
+        AWS_REGION: ${{ inputs.aws-region }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         pull-request-number: github.event.number
-      run: |
-        echo "4"
-#        echo $GITHUB_CONTEXT
       # run: |
-        # echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/ --delete --exclude "PR-[0-9]*"
-        # echo aws cloudfront create-invalidation --distribution-id ${{ inputs.cloudfront-distribution-id }} --paths "/*"
+      #   echo "4"
+      run: |
+        echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/ --delete --exclude "PR-[0-9]*"
+        echo aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/*"
