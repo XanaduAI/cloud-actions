@@ -32,8 +32,10 @@ runs:
   steps:
     - name: On Pull Request creation push the built files to a new folder
       shell: bash
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
       # if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.event.type == 'opened'
-      run: echo ${{ github.event }}
+      run: echo $GITHUB_CONTEXT
 
 
 
