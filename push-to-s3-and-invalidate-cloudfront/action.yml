@@ -34,9 +34,7 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         pull-request-number: github.event.number
-      run: |
-        ls -al ${{ inputs.build-directory }}/
-      # run: echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/
+      run: echo aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/
 
     - name: On Pull Request update push the changed files to the existing folder
       shell: bash
@@ -46,10 +44,8 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         pull-request-number: github.event.number
-      # run: |
-      #   echo "2"
       run: |
-        echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --delete
+        echo aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --delete
         echo aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/PR-$pull-request-number/*"
       
     - name: Delete the folder on S3 when a PR is closed without merging
@@ -60,8 +56,6 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         pull-request-number: github.event.number
-      # run: |
-      #   echo "3"
       run: echo aws s3 rm s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --recursive
       
     - name: When a PR is merged to main update the root folder of the S3 bucket
@@ -72,8 +66,6 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         pull-request-number: github.event.number
-      # run: |
-      #   echo "4"
       run: |
-        echo aws s3 sync docs-build/ s3://${{ inputs.s3-bucket }}/ --delete --exclude "PR-[0-9]*"
+        echo aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/ --delete --exclude "PR-[0-9]*"
         echo aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/*"
