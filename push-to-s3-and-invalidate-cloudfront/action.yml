@@ -1,0 +1,57 @@
+name: Push files to an S3 bucket destination and invalidate the cloudfront cache
+description: |
+  This action will push files to a destination S3 bucket (or a folder within a bucket) and invalidates the cloudfront cache.
+  The action also removes any stale files from the bucket. The action can also delete files/folders from the bucket.
+
+inputs:
+  s3-bucket:
+    description: The name of the S3 bucket
+    required: true
+  # pull-request-number:
+  #   description: The Pull request number in a <PR-123> format. This will also be the name of the folder to push contents to/delete on S3.
+  #   required: false
+  # cloudfront-distribution-id:
+  #   description: The cloudfront distribution ID for the app
+  #   required: false
+  # aws-region:
+  #   description: The aws region used by the IAM machine user
+  #   required: true
+  # aws-access-key-id:
+  #   description: The aws access key id for the IAM machine user
+  #   required:  true
+  # aws-secret-access-key:
+  #   description: The aws secret access key for the IAM machine user
+  #   required:  true
+    
+  # pr-activity-type:
+  #   description: The type of activity for the pull request. Common activity types are a pull request being opened or merged. Full list of activity types can be found here - https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#pull_request
+  #   required: true
+
+runs:
+  using: composite
+  steps:
+    - name: On Pull Request creation push the built files to a new folder
+      shell: bash
+      # if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.event.type == 'opened'
+      run: echo ${{ github.event }}
+
+
+
+      #   if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
+      #   then
+      #     if [[ "$GITHUB_HEAD_REF" == "${{ inputs.source-branch }}" ]]
+      #     then
+      #       echo "Source Branch, $GITHUB_HEAD_REF is ok"
+      #       if [[ "$GITHUB_BASE_REF" == "${{ inputs.destination-branch }}" ]]
+      #       then
+      #         echo "Destination branch, $GITHUB_BASE_REF is ok"
+      #         exit 0
+      #       else
+      #         echo "Destination branch should be ${{ inputs.destination-branch }} and not $GITHUB_BASE_REF"
+      #         exit 1
+      #       fi
+      #     else
+      #       echo "Source branch should be ${{ inputs.source-branch }} and not $GITHUB_HEAD_REF"
+      #       exit 1
+      #     fi
+      #   fi
