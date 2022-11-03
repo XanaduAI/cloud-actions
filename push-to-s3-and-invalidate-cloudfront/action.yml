@@ -33,7 +33,7 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        pull-request-number: github.event.number
+        pull-request-number: ${{ github.event.number }}
       run: aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/
 
     - name: On Pull Request update push the changed files to the existing folder
@@ -43,7 +43,7 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        pull-request-number: github.event.number
+        pull-request-number: ${{ github.event.number }}
       run: |
         aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --delete
         aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/PR-$pull-request-number/*"
@@ -55,7 +55,7 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        pull-request-number: github.event.number
+        pull-request-number: ${{ github.event.number }}
       run: aws s3 rm s3://${{ inputs.s3-bucket }}/PR-$pull-request-number/ --recursive
       
     - name: When a PR is merged to main update the root folder of the S3 bucket
@@ -65,7 +65,7 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        pull-request-number: github.event.number
+        pull-request-number: ${{ github.event.number }}
       run: |
         aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/ --delete --exclude "PR-[0-9]*"
         aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/*"
