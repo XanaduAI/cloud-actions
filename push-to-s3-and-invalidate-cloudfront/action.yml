@@ -48,9 +48,12 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         prno: ${{ github.event.number }}
+        GITHUB_CONTEXT:  ${{ toJson(github) }}
       run: |
-        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$prno/ --delete
-        aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/PR-$prno/*"
+        echo $prno
+        echo $GITHUB_CONTEXT
+#        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/PR-$prno/ --delete
+#        aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/PR-$prno/*"
       
     - name: Delete the folder on S3 when a PR is closed without merging
       shell: bash
