@@ -37,6 +37,7 @@ The following example demonstrates a typical use of this action
   with:
     s3-bucket: myBucket
     build-directory: myBuildDir
+    pull-request-number: 123
     aws-cloudfront-distribution-id: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
     aws-region: ${{ secrets.AWS_REGION }}
     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
