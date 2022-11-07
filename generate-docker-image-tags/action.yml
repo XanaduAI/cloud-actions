@@ -62,7 +62,7 @@ runs:
 
         if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
         then
-          PR_NUMBER="${{ github.event.number }}""
+          PR_NUMBER="${{ github.event.number }}"
         elif [ "$GITHUB_EVENT_NAME" == "push" ]
         then
           # Workflow was triggered by a "push" event.
