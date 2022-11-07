@@ -70,7 +70,7 @@ runs:
             echo "${{ github.event.head_commit.message }}" \
             | grep -o "(#[0-9]*)" \
             | sed 's/[#()]//g'
-          )""
+          )"
         else
           PR_NUMBER=""
         fi
