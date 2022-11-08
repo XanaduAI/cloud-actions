@@ -37,7 +37,7 @@ runs:
 
     - name: Get Tags (generate-docker-image-tags.py)
       id: get-tags
-      run: "python $(dirname ${{ github.action_path }})/src/actions/generate_docker_image_tags.py"
+      run: "python action.py"
       shell: bash
       env:
         INPUT_EVENT_NUMBER: ${{ github.event.number }}
