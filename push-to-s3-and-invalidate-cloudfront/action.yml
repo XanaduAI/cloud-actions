@@ -128,7 +128,7 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
       run: |
-        echo aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/${{ steps.upload.outputs.dir_to_upload_to }} ${{ steps.exclude.outputs.files_to_exlude }}
+        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/${{ steps.upload.outputs.dir_to_upload_to }} ${{ steps.exclude.outputs.files_to_exlude }}
 
     - name: Delete the files on S3
       shell: bash
@@ -137,7 +137,7 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-      run: echo aws s3 rm s3://${{ inputs.s3-bucket }}/${{ steps.upload.outputs.dir_to_delete_from }}/ --recursive
+      run: aws s3 rm s3://${{ inputs.s3-bucket }}/${{ steps.upload.outputs.dir_to_delete_from }}/ --recursive
 
     - name: Invalidate the cloudfront cache
       shell: bash
@@ -147,4 +147,4 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
       run: |
-        echo aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/${{ steps.upload.outputs.dir_to_upload_to }}/*"
+        aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/${{ steps.upload.outputs.dir_to_upload_to }}/*"
