@@ -32,67 +32,11 @@ outputs:
 runs:
   using: composite
   steps:
-    - id: get-branch
-      shell: bash
-      run: |
-        if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
-        then
-          BRANCH=$GITHUB_HEAD_REF
-        elif [ "$GITHUB_EVENT_NAME" == "push" ] || [ "$GITHUB_EVENT_NAME" == "release" ]
-        then
-          BRANCH=${GITHUB_REF##*/}
-        else
-          printf 'Cannot determine tags: Workflow must be triggered by "push", "pull_request", or "release" event.' && exit 1
-        fi
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: pip
 
-        printf "::set-output name=branch::$BRANCH"
-
-    - id: get-tags
-      shell: bash
-      run: |
-        BRANCH=${{ steps.get-branch.outputs.branch }}
-        COMMIT_SHA=${GITHUB_SHA:0:7}
-
-        if [ "$BRANCH" == "main" ] || [ "$BRANCH" == "master" ]
-        then
-          TAGS="latest,$BRANCH,$COMMIT_SHA"
-        else
-          TAGS="${{ inputs.prefix }}.$BRANCH,${{ inputs.prefix }}.$COMMIT_SHA"
-        fi
-
-        if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
-        then
-          PR_NUMBER="${{ github.event.number }}"
-        elif [ "$GITHUB_EVENT_NAME" == "push" ]
-        then
-          # Workflow was triggered by a "push" event.
-          PR_NUMBER=$( \
-            echo "${{ github.event.head_commit.message }}" \
-            | grep -o "(#[0-9]*)" \
-            | sed "s/[#()]//g" \
-          )
-        else
-          PR_NUMBER=""
-        fi
-
-        # Add additional tags for each Story ID associated with this PR.
-        if [ ! -z "$PR_NUMBER" ] && [ ! -z "${{ inputs.shortcut-api-token }}" ]; then
-          url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
-
-          ids=$(
-            curl --silent -X GET \
-            -H "Content-Type: application/json" \
-            -H "Shortcut-Token: ${{ inputs.shortcut-api-token }}" \
-            -d "{ \"page_size\": 20, \"query\": \"is:story and pr:$url\" }" \
-            -L "https://api.app.shortcut.com/api/v3/search" \
-            | jq ".stories.data[].id"
-          )
-
-          while read -r id; do
-            if [ ! -z "$id" ]; then
-              TAGS="$TAGS,sc-$id"
-            fi
-          done <<< "$ids"
-        fi
-
-        printf "::set-output name=tags::$TAGS"
+    - name: Execute generate-docker-image-tags.py
+      run: python .github/actions/generate-docker-image-tags/generate-docker-image-tags.py
+  
