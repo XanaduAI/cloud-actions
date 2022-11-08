@@ -4,39 +4,12 @@ description: |
   The action also removes any stale files from the bucket. The action can also delete files/folders from the bucket.
 
 inputs:
-  s3-bucket:
-    description: The name of the S3 bucket
-    required: true
   build-directory:
     description: The directory that contains the build files to upload to S3
     required: true
   pull-request-number:
     description: The pull request number for which a preview needs to be generated/updated
     required: true
-
-  s3-action:
-    description: |
-      The action to take on the S3 bucket. Typically this should be `update` to push the latest files to S3 or `delete` to delete the folder from S3.
-      If this is not specified, the action will be infered from the $github.event.action variable
-    required: false
-  invalidate-cloudfront-cache:
-    description: A flag to indicate if the cloudfront cache should be invalidated
-    required: false
-    default: 'false'
-
-  s3-dir-to-upload-to:
-    description: |
-      The S3 directory to upload the files to. If unspecified, the default `PR-$pull-request-number` will be used
-      or the directory may be infered from the github context. A value of `/` indicates the root of the bucket.
-    required: false
-    default: "pr-previews"
-  s3-dir-to-delete-from:
-    description: |
-      The directory on S3 whose contents need to be deleted. If unspecified, the default `PR-$pull-request-number` will be used
-      or the directory may be infered from the github context
-    required: false
-    default: "pr-previews"
-
   aws-cloudfront-distribution-id:
     description: The cloudfront distribution ID for the app
     required: true
@@ -49,14 +22,50 @@ inputs:
   aws-secret-access-key:
     description: The aws secret access key for the IAM machine user
     required:  true
+  s3-bucket:
+    description: The name of the S3 bucket
+    required: true
+
+  s3-action:
+    description: |
+      The action to take on the S3 bucket. Typically this should be `update` to push the latest files to S3 or `delete` to delete the folder from S3.
+      If this is not specified, the action will be infered from the $github.event.action variable
+    required: false
+  s3-dir-to-upload-to:
+    description: |
+      The S3 directory to upload the files to. If unspecified, the default `PR-$pull-request-number` will be used
+      or the directory may be infered from the github context. A value of `/` indicates the root of the bucket.
+    required: false
+    default: "pr-previews"
+  s3-dir-to-delete-from:
+    description: |
+      The directory on S3 whose contents need to be deleted. If unspecified, the default `PR-$pull-request-number` will be used
+      or the directory may be infered from the github context
+    required: false
+    default: "pr-previews"
+  s3-files-to-exclude:
+    description: |
+      A pattern or a comma separated list of files to exclude when running the aws s3 sync command. 
+      Refer to https://docs.aws.amazon.com/cli/latest/reference/s3/index.html#use-of-exclude-and-include-filters or more information
+      Set this variable to an empty string if you don't want to exlcude any files
+      If unspecified will default to `pr-previews/*`
+    required: false
+    default: "pr-previews/*"
+  invalidate-cloudfront-cache:
+    description: A flag to indicate if the cloudfront cache should be invalidated
+    required: false
+    default: "false"
 
 outputs:
-  dir-to-upload-to:
+  dir_to_upload_to:
     description: The S3 directory to upload the files to. Computed based on user input
-    value: ${{ steps.upload.dir-to-upload-to }}
-  dir-to-delete-from:
+    value: ${{ steps.upload.dir_to_upload_to }}
+  dir_to_delete_from:
     description: The S3 directory to upload the files to. Computed based on user input
-    value: ${{ steps.delete.dir-to-delete-from }}
+    value: ${{ steps.delete.dir_to_delete_from }}
+  files_to_exlude:
+    description: Files to exclude from S3 when using the sync command.
+    value: ${{ steps.exclude.files_to_exclude }}
 
 runs:
   using: composite
@@ -67,13 +76,13 @@ runs:
       run: |
         if ${{ inputs.s3-dir-to-upload-to }} == "pr-previews"
         then
-          dir-to-upload-to=${{ inputs.s3-dir-to-upload-to }}/PR-${{ inputs.pull-request-number }}
+          dir_to_upload_to=${{ inputs.s3-dir-to-upload-to }}/PR-${{ inputs.pull-request-number }}
         else if ${{ inputs.s3-dir-to-upload-to }} == "/"
-          dir-to-upload-to=""
+          dir_to_upload_to=""
         else
-          dir-to-upload-to=${{ inputs.s3-dir-to-upload-to }}
+          dir_to_upload_to=${{ inputs.s3-dir-to-upload-to }}
         fi
-        echo $dir-to-upload-to >> $GITHUB_OUTPUT
+        echo "dir_to_upload_to=$dir_to_upload_to" >> $GITHUB_OUTPUT
 
     - name: Compute the S3 directory to delete from
       shell: bash
@@ -81,46 +90,51 @@ runs:
       run: |
         if ${{ inputs.s3-dir-to-delete-from }} == "pr-previews"
         then
-          dir-to-delete-from=${{ inputs.s3-dir-to-delete-from }}/PR-${{ inputs.pull-request-number }}
-        else if ${{ inputs.s3-s3-dir-to-delete-from }} == "/"
-          dir-to-delete-from=""
+          dir_to_delete_from=${{ inputs.s3-dir-to-delete-from }}/PR-${{ inputs.pull-request-number }}
+        else if ${{ inputs.s3-dir-to-delete-from }} == "/"
+          dir_to_delete_from=""
         else
-          dir-to-delete-from=${{ inputs.s3-dir-to-delete-from }}
+          dir_to_delete_from=${{ inputs.s3-dir-to-delete-from }}
         fi
-        echo $dir-to-delete-from >> $GITHUB_OUTPUT
+        echo "dir_to_delete_from=$dir_to_delete_from" >> $GITHUB_OUTPUT
 
-        
+    - name: Compute files to exclude
+      shell: bash
+      id: exclude
+      run: |
+        files_to_exlude=""
+        if [[ ${{ inputs.s3-files-to-exclude }} == "pr-previews" ]]
+        then
+          files_to_exlude="--exclude \"${{ inputs.s3-files-to-exclude }}\""
+        else if [[ ${{ inputs.s3-files-to-exclude }} == *,* ]]
+        then
+          IFS=','
+          for i in `echo "${{ inputs.s3-files-to-exclude }}"`
+          do
+            files_to_exlude="$files_to_exlude --exclude \"$i\""
+          done
+          unset IFS
+        fi
+        echo "files_to_exlude=$files_to_exlude" >> $GITHUB_OUTPUT
+
     - name: Upload the files to S3
       shell: bash
-      if: inputs.s3-action.lowercase == 'upload' || (inputs.s3-action == "" && (github.event_name == 'pull_request' && contains(fromJson('["opened", "synchronize"]'), github.event.action)))
+      if: inputs.s3-action.lowercase == 'upload' || (inputs.s3-action == "" && github.event_name == 'pull_request' && (contains(fromJson('["opened", "synchronize"]'), github.event.action) == 'true'))
       env:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
       run: |
-        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/${{ steps.upload.outputs.dir-to-upload-to }}
+        echo aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/${{ steps.upload.outputs.dir_to_upload_to }} ${{ steps.exclude.outputs.files_to_exlude }}
 
     - name: Delete the files on S3
       shell: bash
-      if:  inputs.s3-action.lowercase == 'delete' || (inputs.s3-action == "" && github.event_name == 'pull_request' && github.event_name == 'pull_request' && github.event.action == 'closed')
+      if: inputs.s3-action.lowercase == 'delete' || (inputs.s3-action == "" && github.event_name == 'pull_request' && github.event.action == 'closed')
       env:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-      run: aws s3 rm s3://${{ inputs.s3-bucket }}/${{ steps.upload.outputs.dir-to-delete-from }}/ --recursive
-      
-# TODO: Complete the on push scenario
-    # - name: Upload the files to S3 on push to the specified branch
-    #   shell: bash
-    #   if: github.event_name == 'push' && github.event.action == 'closed' && github.event.pull_request.merged == true && github.base_ref == 'main'
-    #   env:
-    #     AWS_REGION: ${{ inputs.aws-region }}
-    #     AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
-    #     AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-    #   run: |
-    #     aws s3 rm s3://${{ inputs.s3-bucket }}/PR-${{ inputs.pull-request-number }}/ --recursive
-    #     aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/ --delete --exclude "PR-[0-9]*"
-    #     aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/*"
+      run: echo aws s3 rm s3://${{ inputs.s3-bucket }}/${{ steps.upload.outputs.dir_to_delete_from }}/ --recursive
 
     - name: Invalidate the cloudfront cache
       shell: bash
@@ -130,5 +144,5 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
       run: |
-        aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/${{ steps.upload.outputs.dir-to-upload-to }}/*"
+        echo aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/${{ steps.upload.outputs.dir_to_upload_to }}/*"
       
