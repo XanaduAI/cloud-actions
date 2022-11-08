@@ -31,6 +31,7 @@ inputs:
       The action to take on the S3 bucket. Typically this should be `update` to push the latest files to S3 or `delete` to delete the folder from S3.
       If this is not specified, the action will be infered from the $github.event.action variable
     required: false
+    default: ""
   s3-dir-to-upload-to:
     description: |
       The S3 directory to upload the files to. If unspecified, the default `PR-$pull-request-number` will be used
@@ -118,17 +119,10 @@ runs:
           unset IFS
         fi
         echo "files_to_exlude=$files_to_exlude" >> $GITHUB_OUTPUT
-    
-    - name: echo if statements
-      shell: bash
-      run: |
-        echo ${{ inputs.s3-action.lowercase }} == 'upload' || (${{ inputs.s3-action }} == '' && ${{ github.event_name }} == 'pull_request' && (${{ contains(fromJson('["opened", "synchronize"]'), github.event.action) }} == 'true'))
-        echo ${{ inputs.s3-action.lowercase == 'delete' }} || (${{ inputs.s3-action }} == '' && ${{ github.event_name }} == 'pull_request' && ${{ github.event.action }} == 'closed')
-        echo ${{ inputs.invalidate-cloudfront-cache.lowercase }} == 'true'
 
     - name: Upload the files to S3
       shell: bash
-      if: inputs.s3-action.lowercase == 'upload' || (inputs.s3-action == '' && github.event_name == 'pull_request' && (contains(fromJson('["opened", "synchronize"]'), github.event.action) == 'true'))
+      if: inputs.s3-action == 'upload' || (inputs.s3-action == '' && github.event_name == 'pull_request' && contains(fromJson('["opened", "synchronize"]'), github.event.action))
       env:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
@@ -138,7 +132,7 @@ runs:
 
     - name: Delete the files on S3
       shell: bash
-      if: inputs.s3-action.lowercase == 'delete' || (inputs.s3-action == '' && github.event_name == 'pull_request' && github.event.action == 'closed')
+      if: inputs.s3-action == 'delete' || (inputs.s3-action == '' && github.event_name == 'pull_request' && github.event.action == 'closed')
       env:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
@@ -147,7 +141,7 @@ runs:
 
     - name: Invalidate the cloudfront cache
       shell: bash
-      if: inputs.invalidate-cloudfront-cache.lowercase == 'true'
+      if: inputs.invalidate-cloudfront-cache == 'true'
       env:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
