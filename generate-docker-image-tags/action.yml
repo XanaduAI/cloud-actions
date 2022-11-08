@@ -41,7 +41,8 @@ runs:
       run: pip install -r "${{ github.action_path }}/requirements.txt"
       shell: bash
 
-    - name: Execute generate-docker-image-tags.py
+    - name: Get Tags (generate-docker-image-tags.py)
+      id: get-tags
       run: "python ${{ github.action_path }}/generate-docker-image-tags.py"
       shell: bash
       env:

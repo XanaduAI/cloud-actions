@@ -88,7 +88,7 @@ def get_tags(ctx: GitHubContext, branch: str) -> set[str]:
 def write_tags_to_output(tags: set[str]) -> None:
     result = ",".join(tags)
 
-    print(f"Generated tags {result}.")
+    print(f"Generated tags \"{result}\".")
 
     with open(os.environ["GITHUB_OUTPUT"], "a") as f:
         print(f"tags={result}", file=f)
