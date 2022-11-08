@@ -76,12 +76,12 @@ runs:
       run: |
         if [[ "${{ inputs.s3-dir-to-upload-to }}" == "pr-previews" ]]
         then
-          dir_to_upload_to=${{ inputs.s3-dir-to-upload-to }}/PR-${{ inputs.pull-request-number }}
-        else if [[ "${{ inputs.s3-dir-to-upload-to }}" == "/" ]]
+          dir_to_upload_to="${{ inputs.s3-dir-to-upload-to }}/PR-${{ inputs.pull-request-number }}"
+        elif [[ "${{ inputs.s3-dir-to-upload-to }}" == "/" ]]
         then
           dir_to_upload_to=""
         else
-          dir_to_upload_to=${{ inputs.s3-dir-to-upload-to }}
+          dir_to_upload_to="${{ inputs.s3-dir-to-upload-to }}"
         fi
         echo "dir_to_upload_to=$dir_to_upload_to" >> $GITHUB_OUTPUT
 
@@ -89,14 +89,14 @@ runs:
       shell: bash
       id: delete
       run: |
-        if [[ ${{ inputs.s3-dir-to-delete-from }} == "pr-previews" ]]
+        if [[ "${{ inputs.s3-dir-to-delete-from }}" == "pr-previews" ]]
         then
-          dir_to_delete_from=${{ inputs.s3-dir-to-delete-from }}/PR-${{ inputs.pull-request-number }}
-        else if [[ ${{ inputs.s3-dir-to-delete-from }} == "/" ]]
+          dir_to_delete_from="${{ inputs.s3-dir-to-delete-from }}/PR-${{ inputs.pull-request-number }}"
+        elif [[ "${{ inputs.s3-dir-to-delete-from }}" == "/" ]]
         then
           dir_to_delete_from=""
         else
-          dir_to_delete_from=${{ inputs.s3-dir-to-delete-from }}
+          dir_to_delete_from="${{ inputs.s3-dir-to-delete-from }}"
         fi
         echo "dir_to_delete_from=$dir_to_delete_from" >> $GITHUB_OUTPUT
 
@@ -105,10 +105,10 @@ runs:
       id: exclude
       run: |
         files_to_exlude=""
-        if [[ ${{ inputs.s3-files-to-exclude }} == "pr-previews" ]]
+        if [[ "${{ inputs.s3-files-to-exclude }}" == "pr-previews" ]]
         then
           files_to_exlude="--exclude \"${{ inputs.s3-files-to-exclude }}\""
-        else if [[ ${{ inputs.s3-files-to-exclude }} == *,* ]]
+        elif [[ "${{ inputs.s3-files-to-exclude }}" == *,* ]]
         then
           IFS=','
           for i in `echo "${{ inputs.s3-files-to-exclude }}"`
