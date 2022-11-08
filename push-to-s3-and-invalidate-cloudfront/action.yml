@@ -106,10 +106,7 @@ runs:
       id: exclude
       run: |
         files_to_exlude=""
-        if [[ "${{ inputs.s3-files-to-exclude }}" == "pr-previews" ]]
-        then
-          files_to_exlude="--exclude \"${{ inputs.s3-files-to-exclude }}\""
-        elif [[ "${{ inputs.s3-files-to-exclude }}" == *,* ]]
+        if [[ "${{ inputs.s3-files-to-exclude }}" == *,* ]]
         then
           IFS=','
           for i in `echo "${{ inputs.s3-files-to-exclude }}"`
@@ -117,6 +114,9 @@ runs:
             files_to_exlude="$files_to_exlude --exclude \"$i\""
           done
           unset IFS
+        elif [[ "${{ inputs.s3-files-to-exclude }}" == "pr-previews" ]] || [[ "${{ inputs.s3-files-to-exclude }}" != "" ]]
+        then
+          files_to_exlude="--exclude \"${{ inputs.s3-files-to-exclude }}\""
         fi
         echo "files_to_exlude=$files_to_exlude" >> $GITHUB_OUTPUT
 
