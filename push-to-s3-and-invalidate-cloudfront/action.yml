@@ -74,10 +74,11 @@ runs:
       shell: bash
       id: upload
       run: |
-        if ${{ inputs.s3-dir-to-upload-to }} == "pr-previews"
+        if "${{ inputs.s3-dir-to-upload-to }}" == "pr-previews"
         then
           dir_to_upload_to=${{ inputs.s3-dir-to-upload-to }}/PR-${{ inputs.pull-request-number }}
-        else if ${{ inputs.s3-dir-to-upload-to }} == "/"
+        else if "${{ inputs.s3-dir-to-upload-to }}" == "/"
+        then
           dir_to_upload_to=""
         else
           dir_to_upload_to=${{ inputs.s3-dir-to-upload-to }}
@@ -92,6 +93,7 @@ runs:
         then
           dir_to_delete_from=${{ inputs.s3-dir-to-delete-from }}/PR-${{ inputs.pull-request-number }}
         else if ${{ inputs.s3-dir-to-delete-from }} == "/"
+        then
           dir_to_delete_from=""
         else
           dir_to_delete_from=${{ inputs.s3-dir-to-delete-from }}
