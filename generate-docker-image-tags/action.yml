@@ -37,6 +37,10 @@ runs:
         python-version: '3.9'
         cache: pip
 
+    - name: Install requirements
+      run: pip install -r "${{ github.action_path }}/requirements.txt"
+      shell: bash
+
     - name: Execute generate-docker-image-tags.py
       run: "python ${{ github.action_path }}/generate-docker-image-tags.py"
       shell: bash
