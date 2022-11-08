@@ -118,6 +118,13 @@ runs:
           unset IFS
         fi
         echo "files_to_exlude=$files_to_exlude" >> $GITHUB_OUTPUT
+    
+    - name: echo if statements
+      shell: bash
+      run: |
+        echo ${{ inputs.s3-action.lowercase }} == 'upload' || (${{ inputs.s3-action }} == '' && ${{ github.event_name }} == 'pull_request' && (${{ contains(fromJson('["opened", "synchronize"]'), github.event.action }}) == 'true'))
+        echo ${{ inputs.s3-action.lowercase == 'delete' }} || (${{ inputs.s3-action }} == '' && ${{ github.event_name }} == 'pull_request' && ${{ github.event.action }} == 'closed')
+        echo ${{ inputs.invalidate-cloudfront-cache.lowercase }} == 'true'
 
     - name: Upload the files to S3
       shell: bash
