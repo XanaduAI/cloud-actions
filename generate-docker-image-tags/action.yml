@@ -40,4 +40,9 @@ runs:
     - name: Execute generate-docker-image-tags.py
       run: "python ${{ github.action_path }}/generate-docker-image-tags.py"
       shell: bash
+      env:
+        INPUT_EVENT_NUMBER: ${{ github.event.number }}
+        INPUT_PREFIX: ${{ inputs.prefix }}
+        INPUT_HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        INPUT_SHORTCUT_API_TOKEN: ${{ inputs.shortcut-api-token }}
   
