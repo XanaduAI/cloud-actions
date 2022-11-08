@@ -9,9 +9,11 @@ import semver
 if __name__ == "__main__":
     # Parse version file (Cannot import relative boo)
     pkg_base = Path(os.getcwd())
-    ver_file, *_ = [*pkg_base.glob('**/_version.py')]
+    ver_file, *_ = [*pkg_base.glob("**/_version.py")]
     ver_re = re.compile(r".*__version__ = [\"\'](v?)(.*)[\"\']")
-    leading_v, *[file_ver] = ver_re.match((ver_file).read_text().replace('\n', ' ')).groups()
+    leading_v, *[file_ver] = ver_re.match(
+        (ver_file).read_text().replace("\n", " ")
+    ).groups()
 
     subprocess_kwargs = {
         "encoding": "utf-8",
@@ -27,7 +29,8 @@ if __name__ == "__main__":
         subprocess.run(
             f"git show {default_branch}:{ver_file.relative_to(pkg_base)}",
             **subprocess_kwargs,
-        ).stdout.replace('\n', '') or '__version__ = "v0.0.0"',
+        ).stdout.replace("\n", "")
+        or '__version__ = "v0.0.0"',
     ).groups()
     # If version not updated in file
     if semver.compare(default_branch_ver, file_ver) != -1:

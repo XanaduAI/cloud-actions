@@ -34,11 +34,11 @@ test: $(VENV_DIR)
 .PHONY: fmt
 fmt: $(VENV_DIR)
 ifdef check
-	$(VENV_DIR)/bin/black --check src tests
-	$(VENV_DIR)/bin/isort --check src tests
+	$(VENV_DIR)/bin/black --check .
+	$(VENV_DIR)/bin/isort --check .
 else
-	$(VENV_DIR)/bin/black src tests
-	$(VENV_DIR)/bin/isort src tests
+	$(VENV_DIR)/bin/black .
+	$(VENV_DIR)/bin/isort .
 endif
 
 

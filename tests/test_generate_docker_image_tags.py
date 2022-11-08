@@ -2,9 +2,9 @@ from unittest.mock import MagicMock
 
 import pytest
 
-from src.actions.generate_docker_image_tags import (Context, get_pr_number,
-                                                    get_sc_story_ids, get_tags,
-                                                    main, parse_ref)
+from generate_docker_image_tags.action import (Context, get_pr_number,
+                                               get_sc_story_ids, get_tags,
+                                               main, parse_ref)
 
 
 @pytest.fixture
@@ -45,7 +45,7 @@ class TestParseRef:
     @pytest.mark.parametrize(
         "github_ref, expected",
         [
-            ("refs/heads/cloud-actions-test", "cloud-actions-test"),
+            ("refs/heads/cloud-action-test", "cloud-action-test"),
             ("refs/heads/main", "main"),
         ],
     )
@@ -132,9 +132,7 @@ class TestGetScStoryIds:
     @pytest.fixture
     def patch_request_get(self, monkeypatch):
         mock_get = MagicMock()
-        monkeypatch.setattr(
-            "src.actions.generate_docker_image_tags.requests.get", mock_get
-        )
+        monkeypatch.setattr("generate_docker_image_tags.action.requests.get", mock_get)
         return mock_get
 
     def test_get_sc_story_ids(self, mock_context: Context, patch_request_get):
@@ -190,7 +188,7 @@ class TestMain:
     def patch_get_context(self, mock_context, monkeypatch):
         mock_get_context = MagicMock(return_value=mock_context)
         monkeypatch.setattr(
-            "src.actions.generate_docker_image_tags.Context.get", mock_get_context
+            "generate_docker_image_tags.action.Context.get", mock_get_context
         )
         return mock_get_context
 
@@ -198,7 +196,7 @@ class TestMain:
     def patch_get_sc_story_ids(self, monkeypatch):
         mock_call = MagicMock(return_value={"11111"})
         monkeypatch.setattr(
-            "src.actions.generate_docker_image_tags.get_sc_story_ids", mock_call
+            "generate_docker_image_tags.action.get_sc_story_ids", mock_call
         )
         return mock_call
 
@@ -206,7 +204,7 @@ class TestMain:
     def patch_write_tags_to_output(self, monkeypatch):
         mock_func = MagicMock()
         monkeypatch.setattr(
-            "src.actions.generate_docker_image_tags.write_tags_to_output", mock_func
+            "generate_docker_image_tags.action.write_tags_to_output", mock_func
         )
         return mock_func
 

@@ -5,7 +5,7 @@ from typing import Optional
 
 import requests
 
-from ..lib.github_context import GitHubContext
+from lib.github_context import GitHubContext
 
 
 @dataclass
