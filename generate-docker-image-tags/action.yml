@@ -39,4 +39,5 @@ runs:
 
     - name: Execute generate-docker-image-tags.py
       run: python .github/actions/generate-docker-image-tags/generate-docker-image-tags.py
+      shell: bash
   
