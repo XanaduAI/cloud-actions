@@ -1,24 +1,63 @@
 # Action to push files to an S3 bucket to deploy a static web application
 
-This action can be used to update a static web application that is built using AWS S3 and Cloudfront. The action pushes built code to an S3 bucket that already exists. The intended use case for this action is for Pull Request previews.
+This action can be used to update a static web application that is built using AWS S3 and Cloudfront. The action pushes built code to an S3 bucket that already exists. One of the intended use cases for this action is Pull Request previews.
 
-Files are pushed to the S3 bucket only when the triggering workflow is a pull request. Moreover the scenarios below describe how each step in the action is mutually exclusive with the other steps.
+Files are pushed to the S3 bucket depending on the user inputs supplied when the action is called. Some inputs have default values or may be inferred from the github context.
+Following examples describe how to use the action.
 
-## When a new Pull Request is created
-When a new pull request is created, the action will upload the specified folder (`build-directory`) to a folder named `PR-<number>` on the S3 bucket, where `<number>` is the pull request number and `build-directory` is the folder containing all the built files.
+## Uploading to S3 based on user input
+This example will **upload** the specified folder (`build-directory`) to a folder named `blog` on the S3 bucket(`myS3Bucket`). The action will not exclude any files while uploading them. The action will also invalidate the cloudfront cache.
 
-## When an existing Pull Request is updated with new commits
-When new commits are pushed to an existing pull request, the action will upload the specified folder (`build-directory`) to the pull request folder that was used in the earlier run. The action also deletes stale files from the folder on S3. 
-The action then invalidates the cloudfront cache only for the corresponding `PR-<number>` path.
+```yaml
+- uses: XanaduAI/cloud-actions/push-to-s3-and-invalidate-cloudfront@main
+  with:
+    build-directory: build-dir
+    pull-request-number: 123
+    aws-cloudfront-distribution-id: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+    aws-region: ${{ secrets.AWS_REGION }}
+    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    s3-bucket: myS3Bucket
+    s3-action: "upload"
+    s3-dir-to-upload-to: "blog"
+    s3-files-to-exclude: ""
+    invalidate-cloudfront-cache: "true"
+```
 
-## When a Pull Request is closed without merging
-When a pull request is closed without merging, the action will delete the corresponding `PR-<number>` folder on S3.
+## Deleting from S3 based on user input
+This example will **delete** the specified folder (`build-directory`) from the S3 bucket(`myS3Bucket`). The action will also invalidate the cloudfront cache.
 
-## When a Pull Request is merged
-When a pull request is merged into a branch that is not the `main` branch then the action does nothing. This may consequently trigger a different scenario if there is already a pull request open for the branch being merged into.
+```yaml
+- uses: XanaduAI/cloud-actions/push-to-s3-and-invalidate-cloudfront@main
+  with:
+    build-directory: build-dir
+    pull-request-number: 123
+    aws-cloudfront-distribution-id: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+    aws-region: ${{ secrets.AWS_REGION }}
+    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    s3-bucket: myS3Bucket
+    s3-action: "delete"
+    s3-dir-to-delete-from: "blog"
+    invalidate-cloudfront-cache: "true"
+```
 
-When a pull request is merged into the `main` branch, then the action will delete the corresponding `PR-<number>` folder on S3. The action will then upload the specified folder (`build-directory`) to the root folder of the bucket and invalidate the cloudfront cache for the entire site.
+## Uploading/Deleting to/from S3 with minimal user unput
+If this action is called when a `pull_request` is `opened` or `syncronized`, then the example will **upload** the specified folder (`build-directory`) to a folder named `pr-previews/PR-123` on the S3 bucket (`myS3Bucket`). The action will exclude any files that start with the default `pr-previews` prefix. The action will not invalidate the cloudfront cache.
 
+If this action is called when a `pull_request` is `closed`, then the example will **delete** the folder named `pr-previews/PR-123` on the S3 bucket (`myS3Bucket`).
+
+```yaml
+- uses: XanaduAI/cloud-actions/push-to-s3-and-invalidate-cloudfront@main
+  with:
+    build-directory: build-dir
+    pull-request-number: 123
+    aws-cloudfront-distribution-id: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
+    aws-region: ${{ secrets.AWS_REGION }}
+    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    s3-bucket: myS3Bucket
+```
 ## AWS Permissions
 The IAM machine user needs the following permissions on the S3 bucket and the Cloudfront distribution:
 ```
@@ -27,19 +66,4 @@ s3:GetObject
 s3:PutObject
 s3:DeleteObject
 cloudfront:CreateInvalidation
-```
-
-## Example Usage
-The following example demonstrates a typical use of this action
-
-```yaml
-- uses: XanaduAI/cloud-actions/push-to-s3-and-invalidate-cloudfront@main
-  with:
-    s3-bucket: myBucket
-    build-directory: myBuildDir
-    pull-request-number: 123
-    aws-cloudfront-distribution-id: ${{ secrets.AWS_CLOUDFRONT_DISTRIBUTION_ID }}
-    aws-region: ${{ secrets.AWS_REGION }}
-    aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 ```
