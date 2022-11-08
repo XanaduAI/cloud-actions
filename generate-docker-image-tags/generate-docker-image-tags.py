@@ -26,7 +26,7 @@ class GitHubContext:
             server_url=os.environ["GITHUB_SERVER_URL"],
             repository=os.environ["GITHUB_REPOSITORY"],
             event_number=os.environ["INPUT_EVENT_NUMBER"],
-            input_prefix=os.environ["INPUT_PREFIX"],
+            prefix=os.environ["INPUT_PREFIX"],
             head_commit_message=os.environ["INPUT_HEAD_COMMIT_MESSAGE"],
             shortcut_api_token=os.environ["INPUT_SHORTCUT_API_TOKEN"]
         )
