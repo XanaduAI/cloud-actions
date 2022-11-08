@@ -17,12 +17,6 @@ inputs:
   shortcut-api-token:
     description: Shortcut API token for fetching Story IDs related to a PR.
     required: false
-  prefix:
-    description: |
-      The prefix for tagging commits that are not yet merged to main/master.
-      For example: a PR from some-branch would receive the tags <prefix>.some-branch, <prefix>.<COMMIT_SHA>.
-    required: false
-    default: dev
 
 outputs:
   tags:
@@ -43,11 +37,10 @@ runs:
 
     - name: Get Tags (generate-docker-image-tags.py)
       id: get-tags
-      run: "python ${{ github.action_repository }}/src/actions/generate-docker-image-tags.py"
+      run: "python ${{ github.GITHUB_ACTION_PATH }}/../src/actions/generate-docker-image-tags.py"
       shell: bash
       env:
         INPUT_EVENT_NUMBER: ${{ github.event.number }}
-        INPUT_PREFIX: ${{ inputs.prefix }}
         INPUT_HEAD_COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
         INPUT_SHORTCUT_API_TOKEN: ${{ inputs.shortcut-api-token }}
   

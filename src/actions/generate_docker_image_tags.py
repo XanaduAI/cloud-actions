@@ -11,7 +11,6 @@ from src.lib.github_context import GitHubContext
 @dataclass
 class Context(GitHubContext):
     event_number: str
-    prefix: str
     head_commit_message: str
     shortcut_api_token: str
 
@@ -20,7 +19,6 @@ class Context(GitHubContext):
         base = GitHubContext.get()
         return cls(
             event_number=os.environ["INPUT_EVENT_NUMBER"],
-            prefix=os.environ["INPUT_PREFIX"],
             head_commit_message=os.environ["INPUT_HEAD_COMMIT_MESSAGE"],
             shortcut_api_token=os.environ["INPUT_SHORTCUT_API_TOKEN"],
             **base,
