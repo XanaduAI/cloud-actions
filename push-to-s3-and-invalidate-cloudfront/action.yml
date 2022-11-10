@@ -114,7 +114,7 @@ runs:
             files_to_exlude="$files_to_exlude --exclude \"$i\""
           done
           unset IFS
-        elif [[ "${{ inputs.s3-files-to-exclude }}" == "pr-previews" ]] || [[ "${{ inputs.s3-files-to-exclude }}" != "" ]]
+        elif [[ "${{ inputs.s3-files-to-exclude }}" != "" ]]
         then
           files_to_exlude="--exclude \"${{ inputs.s3-files-to-exclude }}\""
         fi
