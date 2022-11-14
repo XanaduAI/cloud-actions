@@ -26,7 +26,8 @@ This example will **upload** the specified folder (`build-directory`) to a folde
 ```
 
 ## Deleting from S3 based on user input
-This example will **delete** the specified folder (`build-directory`) from the S3 bucket(`myS3Bucket`). The action will also invalidate the cloudfront cache. The action will attempt a max of `5` (based on user input) retries for any AWS operations before erroring out.
+This example will **delete** the specified folder (`build-directory`) from the S3 bucket(`myS3Bucket`). The action will also invalidate the cloudfront cache.  The action will attempt a max of `5` (based on `aws-retry-attempts` value) retries for any AWS operations before erroring out.
+
 
 ```yaml
 - uses: XanaduAI/cloud-actions/push-to-s3-and-invalidate-cloudfront@main
