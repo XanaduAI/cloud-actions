@@ -6,7 +6,7 @@ Files are pushed to the S3 bucket depending on the user inputs supplied when the
 Following examples describe how to use the action.
 
 ## Uploading to S3 based on user input
-This example will **upload** the specified folder (`build-directory`) to a folder named `blog` on the S3 bucket(`myS3Bucket`). The action will not exclude any files while uploading them. The action will also invalidate the cloudfront cache.
+This example will **upload** the specified folder (`build-directory`) to a folder named `blog` on the S3 bucket(`myS3Bucket`). The action will not exclude any files while uploading them. The action will also invalidate the cloudfront cache. The action will attempt a max of `5` (based on `aws-retry-attempts` value) retries for any AWS operations before erroring out.
 
 ```yaml
 - uses: XanaduAI/cloud-actions/push-to-s3-and-invalidate-cloudfront@main
@@ -22,10 +22,12 @@ This example will **upload** the specified folder (`build-directory`) to a folde
     s3-dir-to-upload-to: "blog"
     s3-files-to-exclude: ""
     invalidate-cloudfront-cache: "true"
+    aws-retry-attempts: 5
 ```
 
 ## Deleting from S3 based on user input
-This example will **delete** the specified folder (`build-directory`) from the S3 bucket(`myS3Bucket`). The action will also invalidate the cloudfront cache.
+This example will **delete** the specified folder (`build-directory`) from the S3 bucket(`myS3Bucket`). The action will also invalidate the cloudfront cache.  The action will attempt a max of `5` (based on `aws-retry-attempts` value) retries for any AWS operations before erroring out.
+
 
 ```yaml
 - uses: XanaduAI/cloud-actions/push-to-s3-and-invalidate-cloudfront@main
@@ -40,12 +42,14 @@ This example will **delete** the specified folder (`build-directory`) from the S
     s3-action: "delete"
     s3-dir-to-delete-from: "blog"
     invalidate-cloudfront-cache: "true"
+    aws-retry-attempts: 5
 ```
 
 ## Uploading/Deleting to/from S3 with minimal user unput
 If this action is called when a `pull_request` is `opened` or `syncronized`, then the example will **upload** the specified folder (`build-directory`) to a folder named `pr-previews/PR-123` on the S3 bucket (`myS3Bucket`). The action will exclude any files that start with the default `pr-previews` prefix. The action will not invalidate the cloudfront cache.
 
 If this action is called when a `pull_request` is `closed`, then the example will **delete** the folder named `pr-previews/PR-123` on the S3 bucket (`myS3Bucket`).
+The action will attempt a max of `2` (default) retries for any AWS operations before erroring out.
 
 ```yaml
 - uses: XanaduAI/cloud-actions/push-to-s3-and-invalidate-cloudfront@main
