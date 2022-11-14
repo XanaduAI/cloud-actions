@@ -25,9 +25,9 @@ runs:
       shell: bash
     
     - run: |
-        export DEFAULT_BRANCH="${{ inputs.base_branch }}"
-        export PR_BODY="${{ inputs.pr_body }}"
-        export PR_TITLE="${{ inputs.pr_title }}"
+        export DEFAULT_BRANCH=$(echo ${{ inputs.base_branch }} | cat -)
+        export PR_BODY=$(echo ${{ inputs.pr_body }} | cat -)
+        export PR_TITLE=$(echo ${{ inputs.pr_title }} | cat -)
         python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/${{ inputs.dev_branch }}/og/bump/tagger.py 2>/dev/null)" 
       shell: bash
 
