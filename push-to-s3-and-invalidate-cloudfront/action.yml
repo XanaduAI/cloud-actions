@@ -52,7 +52,7 @@ inputs:
     default: "false"
   aws-retry-attempts:
     description: |
-      The number of retries to perform an AWS action. 
+      The number of retries to perform an AWS action. If unspecified will default to 2 retires.
       Refer to https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-retries.html for the usage of retry retry attempts
     required: false
     default: "2"
