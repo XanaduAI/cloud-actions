@@ -38,11 +38,11 @@ runs:
         if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
         then
           BRANCH=$GITHUB_HEAD_REF
-        elif [ "$GITHUB_EVENT_NAME" == "push" ]
+        elif [ "$GITHUB_EVENT_NAME" == "push" ] || [ "$GITHUB_EVENT_NAME" == "release" ]
         then
           BRANCH=${GITHUB_REF##*/}
         else
-          printf 'Cannot determine tags: Workflow must be triggered by "push" or "pull_request" event.' && exit 1
+          printf 'Cannot determine tags: Workflow must be triggered by "push", "pull_request", or "release" event.' && exit 1
         fi
 
         printf "::set-output name=branch::$BRANCH"
@@ -62,14 +62,17 @@ runs:
 
         if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
         then
-          PR_NUMBER=${{ github.event.number }}
-        else
+          PR_NUMBER="${{ github.event.number }}"
+        elif [ "$GITHUB_EVENT_NAME" == "push" ]
+        then
           # Workflow was triggered by a "push" event.
-          PR_NUMBER=$(
-            echo "${{ github.event.head_commit.message }}" \
-            | grep -o "(#[0-9]*)" \
-            | sed 's/[#()]//g'
+          PR_NUMBER=$( \
+            (echo "${{ github.event.head_commit.message }}" \
+            | grep -o "\(#[0-9]\+\)" || true) \
+            | sed "s/[#()]//g" \
           )
+        else
+          PR_NUMBER=""
         fi
 
         # Add additional tags for each Story ID associated with this PR.
