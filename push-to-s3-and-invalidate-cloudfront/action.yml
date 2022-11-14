@@ -1,0 +1,133 @@
+name: Push files to an S3 bucket destination and invalidate the cloudfront cache
+description: |
+  This action will push files to a destination S3 bucket (or a folder within a bucket) and invalidates the cloudfront cache.
+  The action also removes any stale files from the bucket. The action can also delete files/folders from the bucket.
+
+inputs:
+  build-directory:
+    description: The directory that contains the build files to upload to S3
+    required: true
+  aws-cloudfront-distribution-id:
+    description: The cloudfront distribution ID for the app
+    required: true
+  aws-region:
+    description: The aws region used by the IAM machine user
+    required: true
+  aws-access-key-id:
+    description: The aws access key id for the IAM machine user
+    required:  true
+  aws-secret-access-key:
+    description: The aws secret access key for the IAM machine user
+    required:  true
+  s3-bucket:
+    description: The name of the S3 bucket
+    required: true
+
+  pull-request-number:
+    description: The pull request number for which a preview needs to be generated/updated. This is required if you do not specify the s3-directory variable.
+    required: false
+  s3-action:
+    description: |
+      The action to take on the S3 bucket. Typically this should be `update` to push the latest files to S3 or `delete` to delete the folder from S3.
+      If this is not specified, the action will be infered from the $github.event.action variable
+    required: false
+    default: ""
+  s3-directory:
+    description: |
+      The S3 directory to upload the files to or delete the files from. If unspecified, the default `PR-$pull-request-number` will be used
+      or the directory may be infered from the github context. A value of `/` indicates the root of the bucket.
+    required: false
+    default: "pr-previews"
+  s3-files-to-exclude:
+    description: |
+      A pattern or a comma separated list of files to exclude when running the aws s3 sync command. 
+      Refer to https://docs.aws.amazon.com/cli/latest/reference/s3/index.html#use-of-exclude-and-include-filters or more information
+      Set this variable to an empty string if you don't want to exlcude any files
+      If unspecified will default to `pr-previews/*`
+    required: false
+    default: "pr-previews/*"
+  invalidate-cloudfront-cache:
+    description: A flag to indicate if the cloudfront cache should be invalidated
+    required: false
+    default: "false"
+
+outputs:
+  dir_name:
+    description: The S3 directory to upload the files to or delete files from. Computed based on user input.
+    value: ${{ steps.directory.dir_name }}
+  files_to_exlude:
+    description: Files to exclude from S3 when using the sync command.
+    value: ${{ steps.exclude.files_to_exclude }}
+
+runs:
+  using: composite
+  steps:
+    - name: Input validation for pull-request-number
+      if: inputs.s3-directory == 'pr-previews' && inputs.pull-request-number == ''
+      uses: actions/github-script@v6
+      with:
+        script: |
+          core.setFailed('Either of the pull-request-number or the s3-directory are required')
+        
+    - name: Compute the S3 directory to upload to or delete from
+      shell: bash
+      id: directory
+      run: |
+        if [[ "${{ inputs.s3-directory }}" == "pr-previews" ]]
+        then
+          dir_name="${{ inputs.s3-directory }}/PR-${{ inputs.pull-request-number }}"
+        elif [[ "${{ inputs.s3-directory }}" == "/" ]]
+        then
+          dir_name=""
+        else
+          dir_name="${{ inputs.s3-directory }}"
+        fi
+        echo "dir_name=$dir_name" >> $GITHUB_OUTPUT
+
+    - name: Compute files to exclude
+      shell: bash
+      id: exclude
+      run: |
+        files_to_exlude=""
+        if [[ "${{ inputs.s3-files-to-exclude }}" == *,* ]]
+        then
+          IFS=','
+          for i in `echo "${{ inputs.s3-files-to-exclude }}"`
+          do
+            files_to_exlude="$files_to_exlude --exclude \"$i\""
+          done
+          unset IFS
+        elif [[ "${{ inputs.s3-files-to-exclude }}" != "" ]]
+        then
+          files_to_exlude="--exclude \"${{ inputs.s3-files-to-exclude }}\""
+        fi
+        echo "files_to_exlude=$files_to_exlude" >> $GITHUB_OUTPUT
+
+    - name: Upload the files to S3
+      shell: bash
+      if: inputs.s3-action == 'upload' || (inputs.s3-action == '' && github.event_name == 'pull_request' && contains(fromJson('["opened", "synchronize"]'), github.event.action))
+      env:
+        AWS_REGION: ${{ inputs.aws-region }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+      run: |
+        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }} ${{ steps.exclude.outputs.files_to_exlude }}
+
+    - name: Delete the files on S3
+      shell: bash
+      if: inputs.s3-action == 'delete' || (inputs.s3-action == '' && github.event_name == 'pull_request' && github.event.action == 'closed')
+      env:
+        AWS_REGION: ${{ inputs.aws-region }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+      run: aws s3 rm s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }}/ --recursive ${{ steps.exclude.outputs.files_to_exlude }}
+
+    - name: Invalidate the cloudfront cache
+      shell: bash
+      if: inputs.invalidate-cloudfront-cache == 'true'
+      env:
+        AWS_REGION: ${{ inputs.aws-region }}
+        AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
+        AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
+      run: |
+        aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/${{ steps.directory.outputs.dir_name }}/*"
