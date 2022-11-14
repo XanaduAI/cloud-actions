@@ -116,7 +116,7 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        AWS_MAX_ATTEMPTS: $${{ inputs.aws-retry-attempts }}
+        AWS_MAX_ATTEMPTS: ${{ inputs.aws-retry-attempts }}
       run: |
         aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }} ${{ steps.exclude.outputs.files_to_exlude }}
 
@@ -127,7 +127,7 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        AWS_MAX_ATTEMPTS: $${{ inputs.aws-retry-attempts }}
+        AWS_MAX_ATTEMPTS: ${{ inputs.aws-retry-attempts }}
       run: aws s3 rm s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }}/ --recursive ${{ steps.exclude.outputs.files_to_exlude }}
 
     - name: Invalidate the cloudfront cache
@@ -137,6 +137,6 @@ runs:
         AWS_REGION: ${{ inputs.aws-region }}
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
-        AWS_MAX_ATTEMPTS: $${{ inputs.aws-retry-attempts }}
+        AWS_MAX_ATTEMPTS: ${{ inputs.aws-retry-attempts }}
       run: |
         aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/${{ steps.directory.outputs.dir_name }}/*"
