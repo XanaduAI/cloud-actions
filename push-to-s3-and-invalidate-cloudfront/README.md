@@ -6,7 +6,7 @@ Files are pushed to the S3 bucket depending on the user inputs supplied when the
 Following examples describe how to use the action.
 
 ## Uploading to S3 based on user input
-This example will **upload** the specified folder (`build-directory`) to a folder named `blog` on the S3 bucket(`myS3Bucket`). The action will not exclude any files while uploading them. The action will also invalidate the cloudfront cache. The action will attempt a max of `5` (based on user input) retries for any AWS operations before erroring out.
+This example will **upload** the specified folder (`build-directory`) to a folder named `blog` on the S3 bucket(`myS3Bucket`). The action will not exclude any files while uploading them. The action will also invalidate the cloudfront cache. The action will attempt a max of `5` (based on `aws-retry-attempts` value) retries for any AWS operations before erroring out.
 
 ```yaml
 - uses: XanaduAI/cloud-actions/push-to-s3-and-invalidate-cloudfront@main
