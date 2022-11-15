@@ -25,15 +25,20 @@ runs:
       shell: bash
     
     - run: |
+        set +B
+        
         export DEFAULT_BRANCH=`cat << EOF
-          read -r -d '' < ${{ inputs.base_branch }}
+          ${{ inputs.base_branch }}
         EOF`
+        
         export PR_BODY=`cat << EOF
-          read -r -d '' < ${{ inputs.pr_body }}
+          ${{ inputs.pr_body }}
         EOF`
+        
         export PR_TITLE=`cat << EOF
-          read -r -d '' ${{ inputs.pr_title }}
+          ${{ inputs.pr_title }}
         EOF`
+        
         python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/${{ inputs.dev_branch }}/og/bump/tagger.py 2>/dev/null)" 
       shell: bash
 
