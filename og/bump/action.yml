@@ -34,6 +34,5 @@ runs:
         cat << \EOF | tee /tmp/pr_title
           ${{ inputs.pr_title }}
         EOF
-        cat /tmp/pr_body
         python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/${{ inputs.dev_branch }}/og/bump/tagger.py 2>/dev/null)" 
       shell: bash
