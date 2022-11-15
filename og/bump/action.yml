@@ -25,13 +25,13 @@ runs:
       shell: bash
     
     - run: |
-        export DEFAULT_BRANCH=$(cat) << \EOF
+        cat << \EOF | tee /tmp/base_branch
           ${{ inputs.base_branch }}
         EOF
-        export PR_BODY=$(cat) << \EOF
+        cat << \EOF | tee /tmp/pr_body
           ${{ inputs.pr_body }}
         EOF
-        export PR_TITLE=$(cat) << \EOF
+        cat << \EOF | tee /tmp/pr_title
           ${{ inputs.pr_title }}
         EOF
         python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/${{ inputs.dev_branch }}/og/bump/tagger.py 2>/dev/null)" 

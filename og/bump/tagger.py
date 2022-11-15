@@ -20,7 +20,7 @@ if __name__ == "__main__":
         "env": os.environ,
     }
     # Get the name of the default branch
-    default_branch = os.environ["DEFAULT_BRANCH"]
+    default_branch = Path('/tmp/base_branch').read_text().strip()
     print("Default branch is detected as: ", default_branch)
     # Get current version from _version.py on the default branch.
     _, *[default_branch_ver] = ver_re.match(
@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
         default_branch_semver = semver.VersionInfo.parse(default_branch_ver)
         try:
-            pr_body = os.environ["PR_BODY"]
+            pr_body = Path('/tmp/pr_body').read_text().strip()
             bump_dict = {
                 "MAJOR": "bump_major",
                 "MINOR": "bump_minor",
@@ -47,7 +47,7 @@ if __name__ == "__main__":
             print(f"Calling {bump_dict[bump_ver]} using PR body")
             new_ver = methodcaller(bump_dict[bump_ver])(default_branch_semver)
         except IndexError:
-            pr_title = os.environ["PR_TITLE"]
+            pr_title = Path('/tmp/pr_title').read_text().strip()
             bump_dict = {
                 "feat": "bump_minor",
                 "fix": "bump_patch",
