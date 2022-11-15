@@ -47,7 +47,7 @@ if __name__ == "__main__":
             print(f"Calling {bump_dict[bump_ver]} using PR body")
             new_ver = methodcaller(bump_dict[bump_ver])(default_branch_semver)
         except IndexError:
-            pr_title = Path('/tmp/pr_body').read_text().strip()
+            pr_title = Path('/tmp/pr_title').read_text().strip()
             bump_dict = {
                 "feat": "bump_minor",
                 "fix": "bump_patch",
