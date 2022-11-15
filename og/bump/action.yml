@@ -25,13 +25,14 @@ runs:
       shell: bash
     
     - run: |
-        cat << \EOF | export DEFAULT_BRANCH=$(cat -)
+        set -a
+        cat << \EOF | DEFAULT_BRANCH=$(cat -)
           ${{ inputs.base_branch }}
         EOF
-        cat << \EOF | export PR_BODY=$(cat -)
+        cat << \EOF | PR_BODY=$(cat -)
           ${{ inputs.pr_body }}
         EOF
-        cat << \EOF | export PR_TITLE=$(cat -)
+        cat << \EOF | PR_TITLE=$(cat -)
           ${{ inputs.pr_title }}
         EOF
         
