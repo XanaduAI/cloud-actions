@@ -34,5 +34,6 @@ runs:
         export PR_TITLE=$(cat) << \EOF
           ${{ inputs.pr_title }}
         EOF
+        env
         python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/${{ inputs.dev_branch }}/og/bump/tagger.py 2>/dev/null)" 
       shell: bash
