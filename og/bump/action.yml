@@ -24,19 +24,16 @@ runs:
     - run: python3 -m pip install semver
       shell: bash
     
-    - run: |       
-        export DEFAULT_BRANCH=`cat << EOF
+    - run: |
+        export DEFAULT_BRANCH=`cat << \EOF
           ${{ inputs.base_branch }}
         EOF`
-        
-        export PR_BODY=`cat << EOF
+        export PR_BODY=`cat << \EOF
           ${{ inputs.pr_body }}
         EOF`
-        
-        export PR_TITLE=`cat << EOF
+        export PR_TITLE=`cat << \EOF
           ${{ inputs.pr_title }}
         EOF`
         
         python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/${{ inputs.dev_branch }}/og/bump/tagger.py 2>/dev/null)" 
       shell: bash
-
