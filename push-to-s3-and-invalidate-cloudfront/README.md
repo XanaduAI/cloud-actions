@@ -19,7 +19,7 @@ This example will **upload** the specified folder (`build-directory`) to a folde
     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     s3-bucket: myS3Bucket
     s3-action: "upload"
-    s3-dir-to-upload-to: "blog"
+    s3-directory: "blog"
     s3-files-to-exclude: ""
     invalidate-cloudfront-cache: "true"
     aws-retry-attempts: 5
@@ -40,7 +40,7 @@ This example will **delete** the specified folder (`build-directory`) from the S
     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
     s3-bucket: myS3Bucket
     s3-action: "delete"
-    s3-dir-to-delete-from: "blog"
+    s3-directory: "blog"
     invalidate-cloudfront-cache: "true"
     aws-retry-attempts: 5
 ```

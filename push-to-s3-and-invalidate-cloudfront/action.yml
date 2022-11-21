@@ -81,12 +81,12 @@ runs:
       run: |
         if [[ "${{ inputs.s3-directory }}" == "pr-previews" ]]
         then
-          dir_name="${{ inputs.s3-directory }}/PR-${{ inputs.pull-request-number }}"
+          dir_name="${{ inputs.s3-directory }}/PR-${{ inputs.pull-request-number }}/"
         elif [[ "${{ inputs.s3-directory }}" == "/" ]]
         then
           dir_name=""
         else
-          dir_name="${{ inputs.s3-directory }}"
+          dir_name="${{ inputs.s3-directory }}/"
         fi
         echo "dir_name=$dir_name" >> $GITHUB_OUTPUT
 
@@ -128,7 +128,7 @@ runs:
         AWS_ACCESS_KEY_ID: ${{ inputs.aws-access-key-id }}
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         AWS_MAX_ATTEMPTS: ${{ inputs.aws-retry-attempts }}
-      run: aws s3 rm s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }}/ --recursive ${{ steps.exclude.outputs.files_to_exlude }}
+      run: aws s3 rm s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }} --recursive ${{ steps.exclude.outputs.files_to_exlude }}
 
     - name: Invalidate the cloudfront cache
       shell: bash
@@ -139,4 +139,4 @@ runs:
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         AWS_MAX_ATTEMPTS: ${{ inputs.aws-retry-attempts }}
       run: |
-        aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/${{ steps.directory.outputs.dir_name }}/*"
+        aws cloudfront create-invalidation --distribution-id ${{ inputs.aws-cloudfront-distribution-id }} --paths "/${{ steps.directory.outputs.dir_name }}*"
