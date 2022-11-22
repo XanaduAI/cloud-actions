@@ -56,6 +56,12 @@ inputs:
       Refer to https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-retries.html for the usage of retry retry attempts
     required: false
     default: "2"
+  s3-delete-stale-files:
+    description: |
+      A flag to indicate if the aws sync command should be run with the `--delete` flag. This will delete the files that exist in the destination but not in the source.
+      More information on this can be found at https://docs.aws.amazon.com/cli/latest/reference/s3/sync.html
+    required: false
+    default: "false"
 
 outputs:
   dir_name:
@@ -64,6 +70,9 @@ outputs:
   files_to_exlude:
     description: Files to exclude from S3 when using the sync command.
     value: ${{ steps.exclude.files_to_exclude }}
+  delete_stale_files:
+    description: Compute if the aws s3 sync command should run with the `--delete` flag based on user input.
+    value: ${{ steps.stale.delete_stale_files }}
 
 runs:
   using: composite
@@ -108,6 +117,17 @@ runs:
           files_to_exlude="--exclude \"${{ inputs.s3-files-to-exclude }}\""
         fi
         echo "files_to_exlude=$files_to_exlude" >> $GITHUB_OUTPUT
+    
+    - name: Compute if stale files should be deleted
+      shell: bash
+      id: stale
+      run: |
+        delete_stale_files=""
+        if [[ "${{ inputs.s3-delete-stale-files }}" == "true" ]]
+        then
+          delete_stale_files="--delete"
+        fi
+        echo "delete_stale_files=$delete_stale_files" >> $GITHUB_OUTPUT
 
     - name: Upload the files to S3
       shell: bash
@@ -118,7 +138,7 @@ runs:
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         AWS_MAX_ATTEMPTS: ${{ inputs.aws-retry-attempts }}
       run: |
-        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }} ${{ steps.exclude.outputs.files_to_exlude }}
+        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }} ${{ steps.exclude.outputs.files_to_exlude }} ${{ steps.stale.outputs.delete_stale_files }}
 
     - name: Delete the files on S3
       shell: bash
