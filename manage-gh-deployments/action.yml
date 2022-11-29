@@ -90,15 +90,15 @@ runs:
           const deploymentRef = "${{ inputs.deployment_ref }}";
           const deploymentName = "${{ steps.generate_deployment_name.outputs.deployment_name }}";
           
-          const existingDeployments = await github.rest.repos.listDeployments({
+          const existingDeployments = await github.paginate(github.rest.repos.listDeployments.endpoint.merge({
               owner: context.repo.owner,
               repo: context.repo.repo,
               environment: deploymentEnv,
               task: deploymentName,
               ref: deploymentRef
-          });
+          }));
           
-          return existingDeployments.data || [];
+          return existingDeployments || [];
 
     - uses: actions/github-script@v6
       id: delete_deployment
