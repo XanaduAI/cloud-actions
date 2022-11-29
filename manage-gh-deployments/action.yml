@@ -109,7 +109,7 @@ runs:
           const deploymentRef = "${{ inputs.deployment_ref }}";
           const deploymentEnv = "${{ inputs.environment }}";
           const deploymentContextsUserInput = "${{ inputs.required_contexts }}";
-          const deploymentContexts = (deploymentContextsUserInput === "null) ? [] : deploymentContextsUserInput.split("\n").map(elem => elem.split(",")).flat().filter(elem => elem);
+          const deploymentContexts = (deploymentContextsUserInput === "null") ? [] : deploymentContextsUserInput.split("\n").map(elem => elem.split(",")).flat().filter(elem => elem);
           const deploymentLogUrl = "${{ inputs.deployment_log_url }}";
           const deploymentEnvUrl = "${{ inputs.deployment_url }}";
           const userDeploymentIdInput = "${{ inputs.deployment_id }}";
