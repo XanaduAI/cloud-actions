@@ -23,14 +23,6 @@ inputs:
     type: string
     description: The current git ref (branch name) that this deployment was deployed from
     required: true
-  deployment_name:
-    type: string
-    description: |
-      The name of the deployment in the current environment. If you are going to have multiple deployments within one
-      branch/PR, then make a different deployment name for each instance that can be referred back to. 
-      (ex: pr-${PR-ID}-1). If left blank, the deployment_ref is used to generate a deployment name.
-    required: false
-    default: ''
   deployment_id:
     type: string
     description: If passed, the status of the existing deployment will be updated instead of a new deployment being created.
@@ -69,32 +61,17 @@ outputs:
 runs:
   using: composite
   steps:
-    - shell: bash
-      id: generate_deployment_name
-      run: |
-        DEPLOYMENT_NAME_INPUT="${{ inputs.deployment_name }}"
-        if [[ -z "$DEPLOYMENT_NAME_INPUT" ]]
-        then
-            DEPLOYMENT_NAME="${{ inputs.deployment_ref }}"
-        else
-            DEPLOYMENT_NAME="${{ inputs.deployment_name }}"
-        fi
-        DEPLOYMENT_NAME=${DEPLOYMENT_NAME//\//_}  # Replace all instances of '/' (forward slash) with '_' (underscore)
-        echo "deployment_name=deploy:$DEPLOYMENT_NAME" >> $GITHUB_OUTPUT
-
     - uses: actions/github-script@v6
       id: fetch_existing_deployments
       with:
         script: |
           const deploymentEnv = "${{ inputs.environment }}";
           const deploymentRef = "${{ inputs.deployment_ref }}";
-          const deploymentName = "${{ steps.generate_deployment_name.outputs.deployment_name }}";
           
           const existingDeployments = await github.paginate(github.rest.repos.listDeployments.endpoint.merge({
               owner: context.repo.owner,
               repo: context.repo.repo,
               environment: deploymentEnv,
-              task: deploymentName,
               ref: deploymentRef
           }));
           
@@ -130,7 +107,6 @@ runs:
       with:
         result-encoding: string
         script: |          
-          const deploymentName = "${{ steps.generate_deployment_name.outputs.deployment_name }}";
           const deploymentDesc = "${{ inputs.deployment_description }}";
           const deploymentStage = "${{ inputs.deployment_stage }}";
           const deploymentRef = "${{ inputs.deployment_ref }}";
@@ -147,7 +123,6 @@ runs:
               repo: context.repo.repo,
               ref: deploymentRef,
               environment: deploymentEnv,
-              task: deploymentName,
               required_contexts: deploymentContexts,
               transient_environment: true,
               auto_merge: false,
