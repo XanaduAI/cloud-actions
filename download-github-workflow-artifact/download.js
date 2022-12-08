@@ -10,7 +10,7 @@ module.exports = async ({github, context}, workflow_run_id, artifact_name_regex,
             artifact_id: artifact.id,
             archive_format: 'zip'
         });
-        fs.writeFileSync(`${artifact_download_dir}/${artifact.name}`, Buffer.from(download.data));
+        fs.writeFileSync(`${artifact_download_dir}/${artifact.name}.zip`, Buffer.from(download.data));
     };
 
     let artifactsAll = await github.rest.actions.listWorkflowRunArtifacts({
