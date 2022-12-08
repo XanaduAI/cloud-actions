@@ -21,6 +21,10 @@ inputs:
     description: The maximum number of times a download will be retried if there is an error during the download process
     required: false
     default: '15'
+  github_token:
+    description: The GITHUB_TOKEN. Must have access to post comments on pull requests.
+    required: true
+
 
 runs:
   using: composite
@@ -28,7 +32,7 @@ runs:
     - shell: bash
       id: download_dir
       run: |
-        if [ "${{ inputs.artifact_download_dir }}" === '' ]
+        if [ '${{ inputs.artifact_download_dir }}' === '' ]
         then
           echo 'dir_name=${{ github.workspace }}' >> $GITHUB_OUTPUT
         else
