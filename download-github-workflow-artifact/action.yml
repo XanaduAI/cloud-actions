@@ -28,7 +28,7 @@ runs:
     - shell: bash
       id: download_dir
       run: |
-        if [ "${{ input.artifact_download_dir }}" === '' ]
+        if [ "${{ inputs.artifact_download_dir }}" === '' ]
         then
           echo 'dir_name=${{ github.workspace }}' >> $GITHUB_OUTPUT
         else
