@@ -16,7 +16,7 @@ inputs:
     description: |
       The directory where all the artifacts need to be downloaded to. If not provided will default to GITHUB.WORKSPACE
     required: false
-    default: ''
+    default: '${{ github.workspace }}'
   max_retry:
     description: The maximum number of times a download will be retried if there is an error during the download process
     required: false
@@ -29,15 +29,15 @@ inputs:
 runs:
   using: composite
   steps:
-    - shell: bash
-      id: download_dir
-      run: |
-        if [ '${{ inputs.artifact_download_dir }}' == '' ]
-        then
-          echo 'dir_name=${{ github.workspace }}' >> $GITHUB_OUTPUT
-        else
-          echo 'dir_name=${{ inputs.artifact_download_dir }}' >> $GITHUB_OUTPUT
-        fi
+#    - shell: bash
+#      id: download_dir
+#      run: |
+#        if [ '${{ inputs.artifact_download_dir }}' == '' ]
+#        then
+#          echo 'dir_name=${{ github.workspace }}' >> $GITHUB_OUTPUT
+#        else
+#          echo 'dir_name=${{ inputs.artifact_download_dir }}' >> $GITHUB_OUTPUT
+#        fi
 
     - uses: actions/github-script@v6
       with:
@@ -47,5 +47,5 @@ runs:
           await script({github, context}, 
                       ${{ inputs.workflow_run_id }}, 
                       "${{ inputs.artifact_name_regex }}", 
-                      "${{ steps.download_dir.outputs.dir_name }}",
+                      "${{ inputs.artifact_download_dir }}",
                       ${{ inputs.max_retry }});
