@@ -34,13 +34,14 @@ module.exports = async ({github, context}, workflow_run_id, artifact_name_regex,
     */
     for (const artifact of artifactsFiltered) {
         for (let i = 1; i < max_retry + 1; i++) {
+            const artifactFullName = `${artifact_download_dir}/${artifact.name}.zip`;
             try {
-                console.log(`Attempting to download artifact (${artifact.id}): ${artifact_download_dir}/${artifact.name}.zip`);
+                console.log(`Attempting to download artifact (${artifact.id}): ${artifactFullName}`);
                 await downloadArtifact(artifact);
-                console.log(`Successfully downloaded artifact (${artifact.id}): ${artifact_download_dir}/${artifact.name}.zip`);
+                console.log(`Successfully downloaded artifact (${artifact.id}): ${artifactFullName}`);
                 break;
             } catch (e) {
-                console.log(`Error while trying to download artifact (${artifact.id}): ${artifact_download_dir}/${artifact.name}.zip, retryCount: ${i}, error: ${e}`);
+                console.log(`Error while trying to download artifact (${artifact.id}): ${artifactFullName}, retryCount: ${i}, error: ${e}`);
                 ['message', 'status', 'request', 'response'].forEach((attr) => {
                     if (e.hasOwnProperty(attr)) {
                         console.log(`error_${attr}:`);
@@ -48,7 +49,7 @@ module.exports = async ({github, context}, workflow_run_id, artifact_name_regex,
                     }
                 });
                 if (i === max_retry) throw new Error(e);
-                console.log(`Retrying download of artifact: ${artifact.name}`);
+                console.log(`Retrying download of artifact (${artifact.id}): ${artifactFullName}`);
                 await backoffDelay(i);
             }
         }

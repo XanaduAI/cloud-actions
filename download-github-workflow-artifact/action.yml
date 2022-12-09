@@ -29,16 +29,6 @@ inputs:
 runs:
   using: composite
   steps:
-#    - shell: bash
-#      id: download_dir
-#      run: |
-#        if [ '${{ inputs.artifact_download_dir }}' == '' ]
-#        then
-#          echo 'dir_name=${{ github.workspace }}' >> $GITHUB_OUTPUT
-#        else
-#          echo 'dir_name=${{ inputs.artifact_download_dir }}' >> $GITHUB_OUTPUT
-#        fi
-
     - uses: actions/github-script@v6
       with:
         github-token: ${{ inputs.github_token }}
