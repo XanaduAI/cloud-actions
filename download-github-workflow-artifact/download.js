@@ -35,12 +35,12 @@ module.exports = async ({github, context}, workflow_run_id, artifact_name_regex,
     for (const artifact of artifactsFiltered) {
         for (let i = 1; i < max_retry + 1; i++) {
             try {
-                console.log(`Attempting to download artifact: ${artifact.name}`);
+                console.log(`Attempting to download artifact (${artifact.id}): ${artifact_download_dir}/${artifact.name}.zip`);
                 await downloadArtifact(artifact);
-                console.log(`Successfully downloaded artifact: ${artifact.name}`);
+                console.log(`Successfully downloaded artifact (${artifact.id}): ${artifact_download_dir}/${artifact.name}.zip`);
                 break;
             } catch (e) {
-                console.log(`Error while trying to download artifact: ${artifact.name}, i: ${i}, error: ${e}`);
+                console.log(`Error while trying to download artifact (${artifact.id}): ${artifact_download_dir}/${artifact.name}.zip, retryCount: ${i}, error: ${e}`);
                 ['message', 'status', 'request', 'response'].forEach((attr) => {
                     if (e.hasOwnProperty(attr)) {
                         console.log(`error_${attr}:`);
