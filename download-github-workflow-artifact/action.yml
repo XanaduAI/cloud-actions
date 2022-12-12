@@ -18,7 +18,7 @@ inputs:
     required: false
     default: '${{ github.workspace }}'
   max_retry:
-    description: The maximum number of times a download will be retried if there is an error during the download process
+    description: The maximum number of times a download will be retried if there is an error during the download process. Default is 15
     required: false
     default: '15'
   github_token:
