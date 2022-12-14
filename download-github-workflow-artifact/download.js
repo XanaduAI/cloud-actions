@@ -1,7 +1,8 @@
 let fs = require('fs');
 
 module.exports = async ({github, context}, workflow_run_id, artifact_name_regex, artifact_download_dir, max_retry = 15) => {
-    const backoffDelay = (retryCount) => new Promise(resolve => setTimeout(resolve, 1000 * retryCount));
+    // Exponential backoff with a ceiling at 30 seconds
+    const backoffDelay = (retryCount) => new Promise(resolve => setTimeout(resolve, 100 * Math.min(300, 1 << retryCount)));
 
     const downloadArtifact = async (artifact) => {
         let download = await github.rest.actions.downloadArtifact({
