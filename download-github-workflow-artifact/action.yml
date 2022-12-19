@@ -1,0 +1,41 @@
+name: Download Artifact from GitHub Actions Workflow
+description: |
+  This action allows the calling action to download workflow artifacts from other workflow. 
+  Has a built-in retry mechanism with exponential backoff.
+
+inputs:
+  workflow_run_id:
+    description: The workflow run id from which to download the artifacts
+    required: true
+  artifact_name_regex:
+    description: |
+      A regex that can be used to match certain artifact names if all artifacts should not be downloaded
+    required: false
+    default: .*
+  artifact_download_dir:
+    description: |
+      The directory where all the artifacts need to be downloaded to. If not provided will default to GITHUB.WORKSPACE
+    required: false
+    default: '${{ github.workspace }}'
+  max_retry:
+    description: The maximum number of times a download will be retried if there is an error during the download process. Default is 15
+    required: false
+    default: '15'
+  github_token:
+    description: The GITHUB_TOKEN. Must have access to post comments on pull requests.
+    required: true
+
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/github-script@v6
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const script = require('${{ github.action_path }}/download.js');
+          await script({github, context}, 
+                      ${{ inputs.workflow_run_id }}, 
+                      "${{ inputs.artifact_name_regex }}", 
+                      "${{ inputs.artifact_download_dir }}",
+                      ${{ inputs.max_retry }});
