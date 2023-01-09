@@ -1,55 +1,30 @@
 name: Build Docker Image
-description: Build a local Docker image using buildkit
+description: Builds a Docker image (with BuildKit enabled).
 
 inputs:
   path:
-    description: Path to Docker build context
+    description: Docker build context path (e.g., ".").
     required: true
   target:
-    description: Docker build target
+    description: Docker build target (e.g., "server").
     required: true
   tag:
-    description: Local tag for Docker image
+    description: Docker build image tag (e.g., "server-production").
+    required: true
+  docker-build-extra-args:
+    description: Docker build extra arguments (e.g., "--build-arg DEBUG=false").
     required: false
-  docker-args:
-    description: Extra arguments to docker build
-    required: false
-
-outputs:
-  image-id:
-    description: Docker image ID
-    value: ${{ steps.get-image-id.outputs.id }}
 
 runs:
   using: composite
   steps:
-    - name: Generate ID file path
-      id: id-file
-      shell: bash
-      run: printf "::set-output name=path::%s/iidfile_%s_$RANDOM" ${{ runner.temp }} $(date +%s)
-
-    - name: Build image
-      shell: bash
+    - shell: bash
       env:
         DOCKER_BUILDKIT: 1
-      run: |
-        docker build \
-          --iidfile=${{ steps.id-file.outputs.path }} \
-          --target=${{ inputs.target }} \
-          --build-arg COMMIT_SHA=$(git rev-parse --short HEAD) \
-          ${{ inputs.docker-args }} ${{ inputs.path }}
-
-    - name: Get image ID
-      id: get-image-id
-      shell: bash
-      run: |
-        printf "::set-output name=id::%s" $(cat ${{ steps.id-file.outputs.path }})
-        rm -f ${{ steps.id-file.outputs.path }}
-
-    - name: Tag image
-      shell: bash
-      run: |
-        if [ -n "${{ inputs.tag }}" ]
-        then
-          docker tag ${{ steps.get-image-id.outputs.id }} ${{ inputs.tag }}
-        fi
+      run: >
+        docker build
+        --ssh default
+        --tag ${{ inputs.tag }}
+        --target ${{ inputs.target }}
+        --build-arg COMMIT_SHA=${{ github.sha }}
+        ${{ inputs.docker-build-extra-args }} ${{ inputs.path }}
