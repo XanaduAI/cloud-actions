@@ -21,10 +21,11 @@ runs:
     - shell: bash
       env:
         DOCKER_BUILDKIT: 1
-      run:
-        docker build \
-          --ssh default \
-          --tag ${{ inputs.tag }} \
-          --target ${{ inputs.target }} \
-          --build-arg COMMIT_SHA=${{ github.sha }} \
-          ${{ inputs.docker-build-extra-args }} ${{ inputs.path }}
+      run: >
+        docker build
+          --ssh default
+          --tag ${{ inputs.tag }}
+          --target ${{ inputs.target }}
+          --build-arg COMMIT_SHA=${{ github.sha }}
+          ${{ inputs.docker-build-extra-args }}
+          ${{ inputs.path }}
