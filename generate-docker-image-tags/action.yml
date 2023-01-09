@@ -45,7 +45,7 @@ runs:
           printf 'Cannot determine tags: Workflow must be triggered by "push", "pull_request", or "release" event.' && exit 1
         fi
 
-        printf "::set-output name=branch::$BRANCH"
+        echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
     - id: get-tags
       shell: bash
@@ -95,4 +95,4 @@ runs:
           done <<< "$ids"
         fi
 
-        printf "::set-output name=tags::$TAGS"
+        echo "tags=$TAGS" >> $GITHUB_OUTPUT
