@@ -11,7 +11,7 @@ inputs:
     description: Docker build targets as a space-separated list (e.g., "daemon server").
     required: true
   docker-build-extra-args:
-    description: Docker build extra arguments.
+    description: Docker build extra arguments (e.g., "--build-arg DEBUG=false").
     required: false
 
 runs:
