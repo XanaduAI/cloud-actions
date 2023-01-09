@@ -27,5 +27,4 @@ runs:
           --tag ${{ inputs.tag }}
           --target ${{ inputs.target }}
           --build-arg COMMIT_SHA=${{ github.sha }}
-          ${{ inputs.docker-build-extra-args }}
-          ${{ inputs.path }}
+          ${{ inputs.docker-build-extra-args }} ${{ inputs.path }}
