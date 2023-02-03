@@ -25,7 +25,7 @@ if __name__ == "__main__":
     # Get current version from _version.py on the default branch.
     _, *[default_branch_ver] = ver_re.match(
         subprocess.run(
-            f"git show {default_branch}:{ver_file.relative_to(pkg_base)}",
+            f"git show origin/{default_branch}:{ver_file.relative_to(pkg_base)}",
             **subprocess_kwargs,
         ).stdout.replace('\n', '') or '__version__ = "v0.0.0"',
     ).groups()
