@@ -1,0 +1,17 @@
+name: Test-Tags-Slashes
+on:
+  pull_request:
+
+jobs:
+  test_tags_slashes:
+    runs-on: ubuntu-20.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Get tags
+        id: tags
+        uses: XanaduAI/cloud-actions/generate-docker-image-tags@sc-28060-handle-slashes-in-branch-names
+        with:
+          prefix: testing
