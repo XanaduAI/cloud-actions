@@ -15,3 +15,8 @@ jobs:
         uses: XanaduAI/cloud-actions/generate-docker-image-tags@sc-28060-handle-slashes-in-branch-names
         with:
           prefix: testing
+
+      - name: Echo tags
+        id: echo
+        shell: bash
+        run: echo ${{ steps.tags.outputs.tags}}
