@@ -57,9 +57,8 @@ runs:
         then
           TAGS="latest,$BRANCH,$COMMIT_SHA"
         else
-          BADCHAR="/"
-          GOODCHAR="-"
-          TAGS="${{ inputs.prefix }}.${BRANCH//$BADCHAR/$GOODCHAR},${{ inputs.prefix }}.$COMMIT_SHA"
+          SLASHLESS_BRANCH=`echo $BRANCH | tr / -`
+          TAGS="${{ inputs.prefix }}.$SLASHLESS_BRANCH,${{ inputs.prefix }}.$COMMIT_SHA"
         fi
 
         if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
