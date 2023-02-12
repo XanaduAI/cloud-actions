@@ -123,7 +123,7 @@ def main():
 
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=f"Summarize this text as a changelog entry\n\n{base_changelog}",
+            prompt=f"Summarize this text as a changelog entry\n\n{pr_body}",
             temperature=0.7,
             max_tokens=256,
             top_p=1,
@@ -138,7 +138,7 @@ def main():
                 f"""
                 # {version}
                 
-                [#{pr_number}](https://github.com/{github_repository}/pull{pr_number}) {response}
+                [#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {response}
                 
                 {base_changelog}
             """
