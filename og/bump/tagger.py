@@ -61,10 +61,10 @@ def main():
             logger.warn(
                 "Detected non bot commits to the version file, skipping version bump."
             )
-            return leading_v + file_ver
+            return f"{leading_v}{file_ver}"
         if semver.compare(base_branch_ver, file_ver) == -1:
             logger.warn("Version already ahead of base branch, skipping version bump.")
-            return leading_v + file_ver
+            return f"{leading_v}{file_ver}"
 
         logger.info(f"{file_ver=} {base_branch_ver=}")
 
@@ -94,7 +94,7 @@ def main():
         with ver_file.open("w") as fd:
             fd.write(f'__version__ = "{leading_v}{new_ver}"')
 
-        return leading_v + new_ver
+        return f"{leading_v}{new_ver}"
 
     def generate_changelog(version: str) -> None:
         commits = subprocess.run(
