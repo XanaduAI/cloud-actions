@@ -29,7 +29,7 @@ def main():
 
     current_branch = subprocess.run(
         "git rev-parse --abbrev-ref HEAD", **subprocess_kwargs
-    )
+    ).stdout.strip()
     base_branch = os.environ["BASE_BRANCH"]
     pr_body = Path("/tmp/pr_body").read_text().strip()
     pr_title = Path("/tmp/pr_title").read_text().strip()
