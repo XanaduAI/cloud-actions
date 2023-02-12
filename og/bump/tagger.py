@@ -112,9 +112,14 @@ def main():
             f"git show origin/{base_branch}:{changelog_file.relative_to(pkg_base)}",
             **subprocess_kwargs,
         ).stdout
+
         pr_description = pr_body.split(
+            "**Description of the Change:**"
+        )[-1].split(
             "**Version information (please select exactly one):**"
         )[0]
+        
+        
         if (f"# {version}") in base_changelog:
             logger.info("Changelog already up to date, skipping update.")
             return None
@@ -123,7 +128,7 @@ def main():
 
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=f"Summarize this text as a changelog entry\n\n{pr_description}",
+            prompt=f"Summarize this text as a plain changelog entry\n\n{pr_description}",
             temperature=0.7,
             max_tokens=256,
             top_p=1,
