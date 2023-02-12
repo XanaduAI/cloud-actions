@@ -28,18 +28,15 @@ inputs:
 
 runs:
   using: "composite"
-
-  env:
-    BASE_BRANCH: ${{ inputs.base_branch }}
-    OPENAI_API_KEY: ${{ inputs.openai_api_key }}
-    PR_NUMBER: ${{ inputs.pr_number }}
-    GITHUB_REPOSITORY: ${{ inputs.github_repository }}
-
   steps:
-    - run: python3 -m pip install semver
+    - run: python3 -m pip install semver openai
       shell: bash
       
     - run: |
+        export BASE_BRANCH=${{ inputs.base_branch }}
+        export OPENAI_API_KEY=${{ inputs.openai_api_key }}
+        export PR_NUMBER=${{ inputs.pr_number }}
+        export GITHUB_REPOSITORY=${{ inputs.github_repository }}
         cat << \EOF | tee /tmp/pr_body
           ${{ inputs.pr_body }}
         EOF
