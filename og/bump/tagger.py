@@ -108,12 +108,12 @@ def main():
             logger.info("Non BOT commit detected, will not modify CHANGELOG.")
             return None
 
-        base_changelog = (
-            subprocess.run(
-                f"git show origin/{base_branch}:{changelog_file.relative_to(pkg_base)}",
-                **subprocess_kwargs,
-            ).stdout.split("**Version information (please select exactly one):**")
-            or [""]
+        base_changelog = subprocess.run(
+            f"git show origin/{base_branch}:{changelog_file.relative_to(pkg_base)}",
+            **subprocess_kwargs,
+        ).stdout
+        pr_description = pr_body.split(
+            "**Version information (please select exactly one):**"
         )[0]
         if (f"# {version}") in base_changelog:
             logger.info("Changelog already up to date, skipping update.")
@@ -123,7 +123,7 @@ def main():
 
         response = openai.Completion.create(
             model="text-davinci-003",
-            prompt=f"Summarize this text as a changelog entry\n\n{pr_body}",
+            prompt=f"Summarize this text as a changelog entry\n\n{pr_description}",
             temperature=0.7,
             max_tokens=256,
             top_p=1,
