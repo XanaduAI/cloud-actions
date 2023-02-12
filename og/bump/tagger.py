@@ -23,9 +23,9 @@ def main():
         [*pkg_base.glob("**/_version.py")], key=lambda path: len(path.resolve().parents)
     )
     changelog_file = min(
-        [*pkg_base.glob("**/CHANGELOG.md")],
+        [*pkg_base.glob("**/CHANGELOG.md")] or [pkg_base/"CHANGELOG.md"],
         key=lambda path: len(path.resolve().parents),
-    )
+    ) 
 
     current_branch = subprocess.run(
         "git rev-parse --abbrev-ref HEAD", **subprocess_kwargs
