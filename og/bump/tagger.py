@@ -106,9 +106,9 @@ def main():
             logger.info("Non BOT commit detected, will not modify CHANGELOG.")
             return None
 
-        base_changelog = subprocess.run(
+        base_changelog = (subprocess.run(
             f"git show origin/{base_branch}:{changelog_file}"
-        ).stdout.split("**Version information (please select exactly one):**")[0]
+        ).stdout.split("**Version information (please select exactly one):**") or [''])[0]
         if (f"# {version}") in base_changelog:
             logger.info("Changelog already up to date, skipping update.")
             return None
