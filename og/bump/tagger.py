@@ -113,13 +113,10 @@ def main():
             **subprocess_kwargs,
         ).stdout
 
-        pr_description = pr_body.split(
-            "**Description of the Change:**"
-        )[-1].split(
+        pr_description = pr_body.split("**Description of the Change:**")[-1].split(
             "**Version information (please select exactly one):**"
         )[0]
-        
-        
+
         if (f"# {version}") in base_changelog:
             logger.info("Changelog already up to date, skipping update.")
             return None
@@ -146,7 +143,7 @@ def main():
                 [#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {response}
                 
                 {base_changelog}
-            """
+                """
             )
         )
 
