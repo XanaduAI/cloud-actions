@@ -23,9 +23,9 @@ def main():
         [*pkg_base.glob("**/_version.py")], key=lambda path: len(path.resolve().parents)
     )
     changelog_file = min(
-        [*pkg_base.glob("**/CHANGELOG.md")] or [pkg_base/"CHANGELOG.md"],
+        [*pkg_base.glob("**/CHANGELOG.md")],
         key=lambda path: len(path.resolve().parents),
-    ) 
+    )
 
     current_branch = subprocess.run(
         "git rev-parse --abbrev-ref HEAD", **subprocess_kwargs
@@ -53,7 +53,7 @@ def main():
 
         commits = subprocess.run(
             f'git log {current_branch} --not {base_branch} --pretty=format:"%an" -- {ver_file.relative_to(pkg_base)}',
-            **subprocess_kwargs
+            **subprocess_kwargs,
         ).stdout.split()
         non_bot_commits = filter(lambda x: "bot" in x.lowercase().split(" "), commits)
 
@@ -99,7 +99,7 @@ def main():
     def generate_changelog(version: str) -> None:
         commits = subprocess.run(
             f'git log {current_branch} --not {base_branch} --pretty=format:"%an" -- {changelog_file.relative_to(pkg_base)}',
-            **subprocess_kwargs
+            **subprocess_kwargs,
         ).stdout.split()
 
         non_bot_commits = filter(lambda x: "bot" in x.lowercase().split(" "), commits)
@@ -108,10 +108,13 @@ def main():
             logger.info("Non BOT commit detected, will not modify CHANGELOG.")
             return None
 
-        base_changelog = (subprocess.run(
-            f"git show origin/{base_branch}:{changelog_file.relative_to(pkg_base)}",
-            **subprocess_kwargs
-        ).stdout.split("**Version information (please select exactly one):**") or [''])[0]
+        base_changelog = (
+            subprocess.run(
+                f"git show origin/{base_branch}:{changelog_file.relative_to(pkg_base)}",
+                **subprocess_kwargs,
+            ).stdout.split("**Version information (please select exactly one):**")
+            or [""]
+        )[0]
         if (f"# {version}") in base_changelog:
             logger.info("Changelog already up to date, skipping update.")
             return None
