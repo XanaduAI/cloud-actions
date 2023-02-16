@@ -23,7 +23,7 @@ runs:
     - run: | 
         eval `ssh-agent`
         echo "${{ inputs.key }}" | ssh-add -
-        `${{ inputs.pip_command }}`
+        ${{ inputs.pip_command }}
         pip install pytest pytest-cov 
       shell: bash
 
