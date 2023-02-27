@@ -54,8 +54,8 @@ def main():
         commits = subprocess.run(
             f'git log {current_branch} --not {base_branch} --pretty=format:"%an" -- {ver_file.relative_to(pkg_base)}',
             **subprocess_kwargs,
-        ).stdout.split()
-        non_bot_commits = filter(lambda x: "bot" not in x.lowercase().split(" "), commits)
+        ).stdout.split('\n')
+        non_bot_commits = filter(lambda x: "bot" not in x.lower().split(" "), commits)
 
         if any(non_bot_commits):
             logger.warn(
@@ -100,9 +100,9 @@ def main():
         commits = subprocess.run(
             f'git log {current_branch} --not {base_branch} --pretty=format:"%an" -- {changelog_file.relative_to(pkg_base)}',
             **subprocess_kwargs,
-        ).stdout.split()
+        ).stdout.split('\n')
 
-        non_bot_commits = filter(lambda x: "bot" not in x.lowercase().split(" "), commits)
+        non_bot_commits = filter(lambda x: "bot" not in x.lower().split(" "), commits)
 
         if any(non_bot_commits):
             logger.info("Non BOT commit detected, will not modify CHANGELOG.")
