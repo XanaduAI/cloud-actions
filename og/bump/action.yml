@@ -18,9 +18,6 @@ inputs:
   github_repository:
     descripton: Github repository 
     required: true
-  openai_api_key:
-    description: OPENAI API Key
-    required: true  
   dev_branch:
     description: The dev branch of this action to connect to the workflow
     required: false
@@ -29,7 +26,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: python3 -m pip install semver openai
+    - run: python3 -m pip install semver
       shell: bash
       
     - run: |

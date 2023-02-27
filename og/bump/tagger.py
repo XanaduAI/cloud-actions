@@ -6,7 +6,6 @@ from logging import getLogger
 from operator import methodcaller
 from pathlib import Path
 
-import openai
 import semver
 
 
@@ -121,17 +120,6 @@ def main():
             logger.info("Changelog already up to date, skipping update.")
             return None
 
-        openai.api_key = os.getenv("OPENAI_API_KEY")
-
-        response = openai.Completion.create(
-            model="text-davinci-003",
-            prompt=f"Summarize this text as a plain changelog entry\n\n{pr_description}",
-            temperature=0.7,
-            max_tokens=256,
-            top_p=1,
-            frequency_penalty=0,
-            presence_penalty=0,
-        ).choices[0]["text"]
         pr_number = os.environ["PR_NUMBER"]
         github_repository = os.environ["GITHUB_REPOSITORY"]
 
@@ -140,7 +128,7 @@ def main():
                 f"""
                 # {version}
                 
-                [#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {response}
+                [#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}
                 
                 {base_changelog}
                 """
