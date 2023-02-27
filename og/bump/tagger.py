@@ -52,7 +52,7 @@ def main():
         ).groups()
 
         commits = subprocess.run(
-            f'git log {current_branch} --not {base_branch} --pretty=format:"%an" -- {ver_file.relative_to(pkg_base)}',
+            f'git log {current_branch} --not origin/{base_branch} --pretty=format:"%an" -- {ver_file.relative_to(pkg_base)}',
             **subprocess_kwargs,
         ).stdout.split('\n')
         non_bot_commits = filter(lambda x: "bot" not in x.lower().split(" "), commits)
@@ -98,7 +98,7 @@ def main():
 
     def generate_changelog(version: str) -> None:
         commits = subprocess.run(
-            f'git log {current_branch} --not {base_branch} --pretty=format:"%an" -- {changelog_file.relative_to(pkg_base)}',
+            f'git log {current_branch} --not origin/{base_branch} --pretty=format:"%an" -- {changelog_file.relative_to(pkg_base)}',
             **subprocess_kwargs,
         ).stdout.split('\n')
 
