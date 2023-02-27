@@ -31,7 +31,6 @@ runs:
       
     - run: |
         export BASE_BRANCH=${{ inputs.base_branch }}
-        export OPENAI_API_KEY=${{ inputs.openai_api_key }}
         export PR_NUMBER=${{ inputs.pr_number }}
         export GITHUB_REPOSITORY=${{ inputs.github_repository }}
         cat << \EOF | tee /tmp/pr_body
