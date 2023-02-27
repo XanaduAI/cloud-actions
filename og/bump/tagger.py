@@ -11,13 +11,14 @@ import semver
 
 def main():
     logger = getLogger(__name__)
+    pkg_base = Path(os.getcwd())
     subprocess_kwargs = {
         "encoding": "utf-8",
         "stdout": subprocess.PIPE,
         "shell": True,
         "env": os.environ,
+        "cwd": pkg_base
     }
-    pkg_base = Path(os.getcwd())
     ver_file = min(
         [*pkg_base.glob("**/_version.py")], key=lambda path: len(path.resolve().parents)
     )
