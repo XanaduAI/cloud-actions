@@ -62,9 +62,6 @@ def main():
                 "Detected non bot commits to the version file, skipping version bump."
             )
             return f"{leading_v}{file_ver}"
-        if semver.compare(base_branch_ver, file_ver) == -1:
-            logger.warn("Version already ahead of base branch, skipping version bump.")
-            return f"{leading_v}{file_ver}"
 
         logger.info(f"{file_ver=} {base_branch_ver=}")
 
