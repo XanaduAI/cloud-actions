@@ -1,4 +1,3 @@
-import inspect
 import os
 import re
 import subprocess
@@ -17,7 +16,7 @@ def main():
         "stdout": subprocess.PIPE,
         "shell": True,
         "env": os.environ,
-        "cwd": pkg_base
+        "cwd": pkg_base,
     }
     ver_file = min(
         [*pkg_base.glob("**/_version.py")], key=lambda path: len(path.resolve().parents)
@@ -54,7 +53,7 @@ def main():
         commits = subprocess.run(
             f'git log {current_branch} --not origin/{base_branch} --pretty=format:"%an" -- {ver_file.relative_to(pkg_base)}',
             **subprocess_kwargs,
-        ).stdout.split('\n')
+        ).stdout.split("\n")
         non_bot_commits = filter(lambda x: "bot" not in x.lower().split(" "), commits)
 
         if any(non_bot_commits):
@@ -97,7 +96,7 @@ def main():
         commits = subprocess.run(
             f'git log {current_branch} --not origin/{base_branch} --pretty=format:"%an" -- {changelog_file.relative_to(pkg_base)}',
             **subprocess_kwargs,
-        ).stdout.split('\n')
+        ).stdout.split("\n")
 
         non_bot_commits = filter(lambda x: "bot" not in x.lower().split(" "), commits)
 
@@ -110,9 +109,11 @@ def main():
             **subprocess_kwargs,
         ).stdout
 
-        pr_description = pr_body.split("**Description of the Change:**")[-1].split(
-            "**Version information (please select exactly one):**"
-        )[0].strip()
+        pr_description = (
+            pr_body.split("**Description of the Change:**")[-1]
+            .split("**Version information (please select exactly one):**")[0]
+            .strip()
+        )
 
         if (f"# {version}") in base_changelog:
             logger.info("Changelog already up to date, skipping update.")
@@ -122,12 +123,7 @@ def main():
         github_repository = os.environ["GITHUB_REPOSITORY"]
 
         changelog_file.write_text(
-            inspect.cleandoc(
-                f"""# {version}\n[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}
-                
-                {base_changelog}
-                """
-            )
+            f"# {version}\n[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}\n\n{base_changelog}"
         )
 
     generate_changelog(bump())
