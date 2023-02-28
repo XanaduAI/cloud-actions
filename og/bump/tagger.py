@@ -115,7 +115,7 @@ def main():
 
         pr_description = pr_body.split("**Description of the Change:**")[-1].split(
             "**Version information (please select exactly one):**"
-        )[0]
+        )[0].strip()
 
         if (f"# {version}") in base_changelog:
             logger.info("Changelog already up to date, skipping update.")
@@ -126,10 +126,7 @@ def main():
 
         changelog_file.write_text(
             inspect.cleandoc(
-                f"""
-                # {version}
-                
-                [#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}
+                f"""# {version}\n[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}
                 
                 {base_changelog}
                 """
