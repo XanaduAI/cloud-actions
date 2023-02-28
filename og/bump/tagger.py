@@ -34,6 +34,21 @@ def main():
     pr_title = Path("/tmp/pr_title").read_text().strip()
 
     def bump() -> str:
+        """Update the version file and return the version number.
+
+        This function will update the version file only and only if the file was not
+        touched by anyone other than the bot going back as far as base branch. Always
+        returns the head (semantic) version.
+
+        To figure out how much to bump the version, this function will first try to
+        parse the PR description body, looking for checkboxes checked that match the
+        OG standard pattern.
+        If that fails, it will try SC format for the PR title prefix.
+        If that also fails, it will bump the PATCH version.
+
+        Returns:
+            str: Semantic version of HEAD.
+        """
         ver_re = re.compile(r".*__version__ = [\"\'](v?)(.*)[\"\']")
         leading_v, *[file_ver] = ver_re.match(
             (ver_file).read_text().replace("\n", " ")
@@ -50,13 +65,18 @@ def main():
             or '__version__ = "v0.0.0"',
         ).groups()
 
-        commits = subprocess.run(
+        # Get a list of users who have made a commit touching the version file in the current branch.
+        committers = subprocess.run(
             f'git log {current_branch} --not origin/{base_branch} --pretty=format:"%an" -- {ver_file.relative_to(pkg_base)}',
             **subprocess_kwargs,
         ).stdout.split("\n")
-        non_bot_commits = filter(lambda x: "bot" not in x.lower().split(" "), commits)
 
-        if any(non_bot_commits):
+        # Filter the committer list by who has "bot" in their name as a separate word
+        non_bot_committers = filter(
+            lambda x: "bot" not in x.lower().split(" "), committers
+        )
+
+        if any(non_bot_committers):
             logger.warn(
                 "Detected non bot commits to the version file, skipping version bump."
             )
@@ -87,20 +107,32 @@ def main():
             logger.info(f"Calling {bump_ver} using PR title")
 
         logger.info(f"Tagging new version: {new_ver}")
-        with ver_file.open("w") as fd:
-            fd.write(f'__version__ = "{leading_v}{new_ver}"')
+        ver_file.write_text(f'__version__ = "{leading_v}{new_ver}"')
 
         return f"{leading_v}{new_ver}"
 
     def generate_changelog(version: str) -> None:
-        commits = subprocess.run(
+        """This function takes the version string from `bump` function, and formats the
+        relevant PR description section to prepend the CHANGELOG.md with.
+
+        This function will update the CHANGELOG file only and only if the file was not
+        touched by anyone other than the bot going back as far as base branch.
+
+        Args:
+            version (str): Semantic version to tag the CHANGELOG entry with.
+        """
+        # Get a list of users who have made a commit touching the changelog file in the current branch
+        committers = subprocess.run(
             f'git log {current_branch} --not origin/{base_branch} --pretty=format:"%an" -- {changelog_file.relative_to(pkg_base)}',
             **subprocess_kwargs,
         ).stdout.split("\n")
 
-        non_bot_commits = filter(lambda x: "bot" not in x.lower().split(" "), commits)
+        # Filter the committer list by who has "bot" in their name as a separate word
+        non_bot_committers = filter(
+            lambda x: "bot" not in x.lower().split(" "), committers
+        )
 
-        if any(non_bot_commits):
+        if any(non_bot_committers):
             logger.info("Non BOT commit detected, will not modify CHANGELOG.")
             return None
 
