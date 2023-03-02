@@ -13,26 +13,40 @@ inputs:
     description: SC formatted title of the PR.
     required: true
   dev_branch:
-    description: The dev branch of this action to connect to the workflow
+    description: The dev branch of this action to connect to the workflow.
     required: false
     default: 'main'
+  changelog_path:
+    description: Explicit path to the changelog file.
+    require: false
+    default: ''
+  version_template:
+    description: Template for the version number to be added to the changelog file.
+    requrie: false
+    default: "{}"
+
 
 runs:
   using: "composite"
-
   steps:
     - run: python3 -m pip install semver
       shell: bash
-    
+      
+    - run: git checkout ${{ github.head_ref }}
+      shell: bash
+      
     - run: |
-        cat << \EOF | tee /tmp/base_branch
-          ${{ inputs.base_branch }}
-        EOF
-        cat << \EOF | tee /tmp/pr_body
+        if [ -n "${{ inputs.changelog_path }}" ]; then \
+          export CHANGELOG_PATH=${{ inputs.changelog_path }};\
+        fi
+        export BASE_BRANCH=${{ inputs.base_branch }}
+        export PR_NUMBER=${{ github.event.pull_request.number }}
+        export VERSION_TEMPLATE=${{ inputs.version_template }}
+        cat << \EXPECTMENOTINTHYPRDESCRIPTION | tee /tmp/pr_body
           ${{ inputs.pr_body }}
-        EOF
-        cat << \EOF | tee /tmp/pr_title
+        EXPECTMENOTINTHYPRDESCRIPTION
+        cat << \EXPECTMENOTINTHYPRTITLE | tee /tmp/pr_title
           ${{ inputs.pr_title }}
-        EOF
+        EXPECTMENOTINTHYPRTITLE
         python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/${{ inputs.dev_branch }}/og/bump/tagger.py 2>/dev/null)" 
       shell: bash
