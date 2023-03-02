@@ -117,13 +117,13 @@ def generate_changelog(version: str) -> None:
         version (str): Semantic version to tag the CHANGELOG entry with.
     """
     # Get a list of users who have made a commit touching the changelog file in the current branch
-    changelog_file = os.environ.get(
-        "CHANGELOG_PATH",
-        min(
+    if changelog_file := os.environ.get("CHANGELOG_PATH").strip():
+        changelog_file = Path(changelog_file)
+    else:
+        changelog_file = min(
             [*pkg_base.glob("**/CHANGELOG.md")],
             key=lambda path: len(path.resolve().parents),
-        ),
-    )
+        )
     committers = subprocess.run(
         f'git log {current_branch} --not origin/{base_branch} --pretty=format:"%an" -- {changelog_file.relative_to(pkg_base)}',
         **subprocess_kwargs,
