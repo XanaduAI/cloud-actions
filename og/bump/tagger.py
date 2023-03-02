@@ -154,6 +154,8 @@ def generate_changelog(version: str) -> None:
     pr_number = os.environ["PR_NUMBER"]
     github_repository = os.environ["GITHUB_REPOSITORY"]
 
+    version = os.environ["VERSION_TEMPLATE"].strip().format(version)
+
     changelog_file.write_text(
         f"# {version}\n[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}\n\n{base_changelog}"
     )

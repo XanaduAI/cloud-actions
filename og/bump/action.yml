@@ -20,6 +20,10 @@ inputs:
     description: Explicit path to the changelog file.
     require: false
     default: ''
+  version_template:
+    description: Template for the version number to be added to the changelog file.
+    requrie: false
+    default: "{}"
 
 
 runs:
@@ -37,6 +41,7 @@ runs:
         fi
         export BASE_BRANCH=${{ inputs.base_branch }}
         export PR_NUMBER=${{ github.event.pull_request.number }}
+        export VERSION_TEMPLATE=${{ inputs.version_template }}
         cat << \EXPECTMENOTINTHYPRDESCRIPTION | tee /tmp/pr_body
           ${{ inputs.pr_body }}
         EXPECTMENOTINTHYPRDESCRIPTION
