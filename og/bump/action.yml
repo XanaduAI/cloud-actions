@@ -31,7 +31,13 @@ runs:
       
     - run: |
         echo "$(git branch --contains $(git show -s --format=%H))"
-        git checkout $(git branch --contains $(git show -s --format=%H) | tail -n1)
+        echo ${GITHUB_SHA}
+        echo ${GITHUB_REF}
+        echo ${GITHUB_REF_NAME}
+        echo ${{ github.head_ref }}
+        echo ${{ github.base_ref }}
+        
+
       shell: bash
       
     - run: |
