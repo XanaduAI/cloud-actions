@@ -29,15 +29,7 @@ runs:
     - run: python3 -m pip install semver
       shell: bash
       
-    - run: |
-        echo "$(git branch --contains $(git show -s --format=%H))"
-        echo ${GITHUB_SHA}
-        echo ${GITHUB_REF}
-        echo ${GITHUB_REF_NAME}
-        echo ${{ github.head_ref }}
-        echo ${{ github.base_ref }}
-        
-
+    - run: git checkout ${{ github.head_ref }}
       shell: bash
       
     - run: |
