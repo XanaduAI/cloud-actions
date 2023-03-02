@@ -29,7 +29,7 @@ runs:
     - run: python3 -m pip install semver
       shell: bash
       
-    - run: git checkout $(git branch --contains $(git rev-parse HEAD) | tail -n1)
+    - run: git checkout $(git branch --contains $(git rev-parse $(git log --pretty=format:'%H' -n1)) | tail -n1)
       shell: bash
       
     - run: |
