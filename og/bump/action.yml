@@ -30,6 +30,7 @@ runs:
       shell: bash
       
     - run: |
+        echo "$(git branch --contains $(git show -s --format=%H)"
         git checkout $(git branch --contains $(git show -s --format=%H) | tail -n1)
       shell: bash
       
