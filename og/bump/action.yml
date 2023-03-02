@@ -6,6 +6,9 @@ inputs:
   base_branch:
     description: The base branch of the PR.
     required: true
+  feature_branch:
+    description: The current feature branch.
+    required: true
   pr_body:
     description: OG formatted body of the PR description.
     required: true
@@ -27,6 +30,9 @@ runs:
   using: "composite"
   steps:
     - run: python3 -m pip install semver
+      shell: bash
+      
+    - run: git checkout ${{ inputs.feature_branch }}
       shell: bash
       
     - run: |
