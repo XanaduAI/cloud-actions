@@ -118,7 +118,7 @@ def generate_changelog(version: str) -> None:
     """
     # Get a list of users who have made a commit touching the changelog file in the current branch
     if changelog_file := os.environ.get("CHANGELOG_PATH").strip():
-        changelog_file = Path(changelog_file)
+        changelog_file = Path(changelog_file).resolve()
     else:
         changelog_file = min(
             [*pkg_base.glob("**/CHANGELOG.md")],
