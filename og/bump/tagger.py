@@ -70,7 +70,7 @@ def bump() -> str:
     # Filter the committer list by who has "bot" in their name as a separate word
     non_bot_committers = filter(lambda x: "bot" not in x.lower().split(" "), committers)
 
-    if any(non_bot_committers):
+    if any(non_bot_committers) and semver.compare(base_branch_ver, file_ver) == -1:
         logger.warn(
             "Detected non bot commits to the version file, skipping version bump."
         )
