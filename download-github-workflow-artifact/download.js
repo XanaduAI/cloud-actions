@@ -20,7 +20,7 @@ module.exports = async ({github, context}, workflow_run_id, artifact_name_regex,
         run_id: workflow_run_id
     });
     let artifactsAll = await github.paginate(artifactsAllOpts);
-    let artifactsFiltered = artifactsAll.data.artifacts.filter((artifact) => {
+    let artifactsFiltered = artifactsAll.filter((artifact) => {
         return artifact.name.match(artifact_name_regex)
     });
 
