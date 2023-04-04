@@ -14,11 +14,12 @@ module.exports = async ({github, context}, workflow_run_id, artifact_name_regex,
         fs.writeFileSync(`${artifact_download_dir}/${artifact.name}.zip`, Buffer.from(download.data));
     };
 
-    let artifactsAll = await github.rest.actions.listWorkflowRunArtifacts({
+    let artifactsAllOpts = github.rest.actions.listWorkflowRunArtifacts.endpoint.merge({
         owner: context.repo.owner,
         repo: context.repo.repo,
         run_id: workflow_run_id
     });
+    let artifactsAll = await github.paginate(artifactsAllOpts);
     let artifactsFiltered = artifactsAll.data.artifacts.filter((artifact) => {
         return artifact.name.match(artifact_name_regex)
     });
