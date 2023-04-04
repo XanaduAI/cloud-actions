@@ -1,17 +1,17 @@
 name: Generate Docker Image Tags
 description: Generate a list of Docker image tags for the current workflow.
 # The returned tags depend on the branch the workflow runs on:
-#    * If the current branch is a development branch (i.e. not master or main),
-#      the image will receive "development" tags (prefixed with "dev."). It will
+#    * If the current branch is a development branch (i.e., not master or main),
+#      the image will receive "temporary" tags (prefixed with "temp."). It will
 #      be tagged with both the commit hash and the branch name. For example, a
 #      commit on branch "feature-branch" with hash "425840e" will receive the
-#      following tags: {dev.feature-branch, dev.425840e}.
+#      following tags: {temp.feature-branch, temp.425840e}.
 #
 #    * If the current branch is master or main, the image will receive the same
-#      tags (branch and commit hash) but without the "dev." prefix. It will also
+#      tags (branch and commit hash) but without the "temp." prefix. It will also
 #      receive the special "latest" tag that Docker uses by default. For example,
-#      a commit on branch "master" with hash "425840e" will receive the following
-#      tags: {latest, master, 425840e}
+#      a commit on branch "main" with hash "425840e" will receive the following
+#      tags: {latest, main, 425840e}
 
 inputs:
   shortcut-api-token:
@@ -22,7 +22,7 @@ inputs:
       The prefix for tagging commits that are not yet merged to main/master.
       For example: a PR from some-branch would receive the tags <prefix>.some-branch, <prefix>.<COMMIT_SHA>.
     required: false
-    default: dev
+    default: temp
 
 outputs:
   tags:
