@@ -101,7 +101,7 @@ def bump() -> str:
         logger.info(f"Calling {bump_ver} using PR title")
 
     logger.info(f"Tagging new version: {new_ver}")
-    ver_file.write_text(f'__version__ = "{leading_v}{new_ver}"')
+    ver_file.write_text(f'__version__ = "{leading_v}{new_ver}"\n')
 
     return f"{leading_v}{new_ver}"
 
