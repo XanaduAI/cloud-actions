@@ -15,7 +15,7 @@ runs:
       shell: bash
 
     - run: |
-          MODIFIED_PY_FILES="$(git diff origin/${{ inputs.base_branch }} --diff-filter=MAC --name-only | grep -i '\.py$' | sed -z 's/\n/ /g' || true)"
+          MODIFIED_PY_FILES="$(git diff origin/${{ inputs.base_branch }} --diff-filter=MAC --name-only | grep -i '\.py$' | sed -z 's/\n/ /g')"
           if [ -n "${MODIFIED_PY_FILES}" ]; then \
             black ${MODIFIED_PY_FILES} ; \
             isort --profile=black ${MODIFIED_PY_FILES} ; \
