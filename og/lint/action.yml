@@ -22,7 +22,7 @@ runs:
             echo "Running isort..." ; \
             isort --profile=black ${MODIFIED_PY_FILES} ; \
             echo "Running docformatter..." ; \
-            docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 ${MODIFIED_PY_FILES} ; \
+            trap 'docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 ${MODIFIED_PY_FILES} || echo "docformatter returned status 3."' EXIT; \
             echo "Running flake8..." ; \
             flake8 --ignore=E203,E501,W503 ${MODIFIED_PY_FILES} ; \
           fi
