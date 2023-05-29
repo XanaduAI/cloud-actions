@@ -49,4 +49,5 @@ runs:
           ${{ inputs.pr_title }}
         EXPECTMENOTINTHYPRTITLE
         python -c "$(wget -qSO- https://raw.githubusercontent.com/XanaduAI/cloud-actions/${{ inputs.dev_branch }}/og/bump/tagger.py 2>/dev/null)" 
+        git add .;
       shell: bash
