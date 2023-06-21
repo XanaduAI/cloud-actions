@@ -141,11 +141,9 @@ def generate_changelog(version: str) -> None:
 
     if any(non_bot_committers):
         logger.info("Non BOT commit detected, will not modify CHANGELOG.")
-        with changelog_file.open('r') as fd:
-            while not(line:=''):
-                line=fd.readline().strip()
-            if not line.removeprefix("# ") == version:
-                raise RuntimeError(f"Unexpected version in CHANGELOG. Expected {version}, got {line}.")
+        line = [*filter(None, changelog_file.read_text().splitlines())][0]
+        if not line.removeprefix("# ") == version:
+            raise RuntimeError(f"Unexpected version in CHANGELOG. Expected {version}, got {line}.")
                     
         return None
 
