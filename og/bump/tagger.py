@@ -147,9 +147,9 @@ def generate_changelog(version: str) -> None:
                 changelog_file.read_text().splitlines(),
             )
         )
-        if not line.removeprefix("# ") == version:
+        if not (changelog_version := line.removeprefix("# ")) == version:
             raise RuntimeError(
-                f"Unexpected version in CHANGELOG. Expected {version}, got {line}."
+                f"Unexpected version in CHANGELOG. Expected {version}, got {changelog_version}."
             )
 
         return None
