@@ -139,7 +139,13 @@ def generate_changelog(version: str) -> None:
     # Filter the committer list by who has "bot" in their name as a separate word
     non_bot_committers = filter(lambda x: "bot" not in x.lower().split(" "), committers)
 
-    if any(non_bot_committers):
+    # Check if the changelog file is identical to the base_branch changelog
+    changelog_was_modified = bool(subprocess.run(
+        f'git diff origin/{base_branch} -s --exit-code -- {changelog_file.relative_to(pkg_base)}',
+        **subprocess_kwargs
+    ).returncode)
+
+    if any(non_bot_committers) and changelog_was_modified:
         logger.info("Non BOT commit detected, will not modify CHANGELOG.")
         line = next(
             filter(
