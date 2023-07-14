@@ -139,9 +139,9 @@ def generate_changelog(version: str) -> None:
     # Filter the committer list by who has "bot" in their name as a separate word
     non_bot_committers = filter(lambda x: "bot" not in x.lower().split(" "), committers)
 
-    # Check if the changelog file is identical to the base_branch changelog
+    # Check if the changelog file is identical (ignoring whitespace) to the base_branch changelog
     changelog_was_modified = bool(subprocess.run(
-        f'git diff origin/{base_branch} -s --exit-code -- {changelog_file.relative_to(pkg_base)}',
+        f'git diff origin/{base_branch} --ignore-blank-lines -w -s --exit-code -- {changelog_file.relative_to(pkg_base)}',
         **subprocess_kwargs
     ).returncode)
 
