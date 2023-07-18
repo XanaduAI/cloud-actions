@@ -1,29 +1,27 @@
-name: Multi-arch Docker Build & Push
+name: Multi-arch Docker Image Build & Push
 
 on:
   workflow_call:
     inputs:
       tag:
-        description: Tag to use
+        description: Tag to be assigned when pushing the image to ECR repo
         required: true
         type: string
       latest:
-        description: Tag as latest
+        description: Tag as latest, if enabled image will be also tagged as 'latest' in ECR repo
         required: false
         type: boolean
         default: false
       image-target:
-        description: Target for build
-        required: false
+        description: Target for image build, selects stage for a multi-stage Dockefile
+        required: true
         type: string
-        default: base
       Dockerfile:
-        description: Dockerfile to use
-        required: false
+        description: Dockerfile to be used for the build, accepts path to file
+        required: true
         type: string
-        default: env.Dockerfile
       build-context:
-        description: Build context
+        description: Build context to be used by 'docker build' command
         required: false
         type: string
         default: .
