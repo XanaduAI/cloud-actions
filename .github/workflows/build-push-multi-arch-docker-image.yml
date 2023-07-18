@@ -39,7 +39,7 @@ on:
 
 jobs:
   build-push:
-    name: Base Docker env to ECR
+    name: Docker image to ECR
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
