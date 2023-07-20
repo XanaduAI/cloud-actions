@@ -138,7 +138,7 @@ runs:
         AWS_SECRET_ACCESS_KEY: ${{ inputs.aws-secret-access-key }}
         AWS_MAX_ATTEMPTS: ${{ inputs.aws-retry-attempts }}
       run: |
-        aws s3 sync ${{ inputs.build-directory }}/ s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }} ${{ steps.exclude.outputs.files_to_exlude }} ${{ steps.stale.outputs.delete_stale_files }}
+        aws s3 sync ${{ inputs.build-directory }} s3://${{ inputs.s3-bucket }}/${{ steps.directory.outputs.dir_name }} ${{ steps.exclude.outputs.files_to_exlude }} ${{ steps.stale.outputs.delete_stale_files }}
 
     - name: Delete the files on S3
       shell: bash
