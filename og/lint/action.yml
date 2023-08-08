@@ -15,7 +15,7 @@ runs:
       shell: bash
 
     - run: |
-          MODIFIED_PY_FILES="$(git diff origin/${{ inputs.base_branch }} --diff-filter=MAC --name-only | grep -i '\.py$' | xargs -r realpath)"
+          MODIFIED_PY_FILES="$(git diff origin/${{ inputs.base_branch }} --diff-filter=MAC --name-only | (grep -i '\.py$' || true) | xargs -r realpath)"
           if [ -n "${MODIFIED_PY_FILES}" ]; then \
             echo "Running black..." ; \
             black ${MODIFIED_PY_FILES} ; \
