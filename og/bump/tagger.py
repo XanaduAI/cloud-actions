@@ -187,7 +187,7 @@ def generate_changelog(version: str) -> None:
     if changelog.get(f"# {version}") != pr_description:
         changelog[
             f"# {version}"
-        ] = f"[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}\n\n{base_changelog}"
+        ] = f"[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}"
 
     changelog_file.write_text(
         "\n\n".join(
