@@ -140,10 +140,12 @@ def generate_changelog(version: str) -> None:
     non_bot_committers = filter(lambda x: "bot" not in x.lower().split(" "), committers)
 
     # Check if the changelog file is identical (ignoring whitespace) to the base_branch changelog
-    changelog_was_modified = bool(subprocess.run(
-        f'git diff origin/{base_branch} --ignore-blank-lines -w -s --exit-code -- {changelog_file.relative_to(pkg_base)}',
-        **subprocess_kwargs
-    ).returncode)
+    changelog_was_modified = bool(
+        subprocess.run(
+            f"git diff origin/{base_branch} --ignore-blank-lines -w -s --exit-code -- {changelog_file.relative_to(pkg_base)}",
+            **subprocess_kwargs,
+        ).returncode
+    )
 
     if any(non_bot_committers) and changelog_was_modified:
         logger.info("Non BOT commit detected, will not modify CHANGELOG.")
@@ -170,18 +172,30 @@ def generate_changelog(version: str) -> None:
         .split("**Version information (please select exactly one):**")[0]
         .strip()
     )
-
-    if (f"# {version}") in base_changelog:
-        logger.info("Changelog already up to date, skipping update.")
-        return None
+    reg = re.compile(r"\#\s?v?\d+\.\d+\.\d+")
+    changelog = {
+        k: v.strip()
+        for k, v in zip(
+            re.findall(reg, base_changelog), re.split(reg, base_changelog)[1:]
+        )
+    }
 
     pr_number = os.environ["PR_NUMBER"]
     github_repository = os.environ["GITHUB_REPOSITORY"]
-
     version = os.environ["VERSION_TEMPLATE"].strip().format(version)
 
+    if pr_description != changelog_file[f"# {version}"]:
+        changelog[
+            f"# {version}"
+        ] = f"[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}\n\n{base_changelog}"
+
     changelog_file.write_text(
-        f"# {version}\n[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}\n\n{base_changelog}"
+        "\n\n".join(
+            [
+                f"{version}\n\n{changelog[version]}"
+                for version in sorted(changelog.keys(), reverse=True)
+            ]
+        )
     )
 
 
