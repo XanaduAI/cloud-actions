@@ -172,7 +172,7 @@ def generate_changelog(version: str) -> None:
         .split("**Version information (please select exactly one):**")[0]
         .strip()
     )
-    reg = re.compile(r"\#\s?v?\d+\.\d+\.\d+")
+    reg = re.compile(r"\#\s?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?")
     changelog = {
         k: v.strip()
         for k, v in zip(
