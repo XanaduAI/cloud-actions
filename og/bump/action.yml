@@ -32,7 +32,6 @@ runs:
     - name: Checkout
       run: git checkout ${{ github.head_ref }}
       shell: bash
-      
         
     - name: Run the main logic
       shell: python
@@ -60,7 +59,7 @@ runs:
         current_branch = subprocess.run(
             "git rev-parse --abbrev-ref HEAD", **subprocess_kwargs
         ).stdout.strip()
-        base_branch = "{{ inputs.base_branch }}"
+        base_branch = "${{ inputs.base_branch }}"
         pr_body = """${{ inputs.pr_body }}""".strip()
         pr_title = """${{ inputs.pr_title }}""".strip()
 
