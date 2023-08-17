@@ -10,18 +10,19 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-      
-    - run: | 
+    - name: Install dependencies
+      shell: bash
+      run: | 
           pip install black isort docformatter flake8
-      shell: bash
       
-    - run: |
-          export BASE_BRANCH=${{ inputs.base_branch }}
+    - name: Export environment variables
       shell: bash
+      run: |
+          export BASE_BRANCH=${{ inputs.base_branch }}
 
-    - run: |
+    - name: Run the main logic
+      shell: python
+      run: |
           import os
           import subprocess
           from pathlib import Path
@@ -68,4 +69,3 @@ runs:
               subprocess.run(
                   f"flake8 --ignore=E203,E501,W503 {files_to_format}", shell=True, check=True
               )
-    shell: python
