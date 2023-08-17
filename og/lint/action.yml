@@ -15,11 +15,6 @@ runs:
       run: | 
           pip install black isort docformatter flake8
       
-    - name: Export environment variables
-      shell: bash
-      run: |
-          export BASE_BRANCH=${{ inputs.base_branch }}
-
     - name: Run the main logic
       shell: python
       run: |
@@ -41,7 +36,7 @@ runs:
           edited_py_files = {
               _file
               for file in subprocess.run(
-                  f"git diff origin/{os.environ['BASE_BRANCH']} --diff-filter=MAC --name-only",
+                  f"git diff origin/${{ inputs.base_branch }} --diff-filter=MAC --name-only",
                   shell=True,
                   stdout=subprocess.PIPE,
                   encoding="utf-8",
