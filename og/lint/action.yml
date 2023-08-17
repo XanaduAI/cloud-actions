@@ -10,11 +10,14 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      
     - run: | 
           pip install black isort docformatter flake8
       shell: bash
-
+      
     - run: |
           export BASE_BRANCH=${{ inputs.base_branch }}
-          python resolve.py
+          python respolve.py
       shell: bash
