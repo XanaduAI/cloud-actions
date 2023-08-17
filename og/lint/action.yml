@@ -15,15 +15,6 @@ runs:
       shell: bash
 
     - run: |
-          MODIFIED_PY_FILES="$(git diff origin/${{ inputs.base_branch }} --diff-filter=MAC --name-only | (grep -i '\.py$' || true) | xargs -r realpath)"
-          if [ -n "${MODIFIED_PY_FILES}" ]; then \
-            echo "Running black..." ; \
-            black ${MODIFIED_PY_FILES} ; \
-            echo "Running isort..." ; \
-            isort --profile=black ${MODIFIED_PY_FILES} ; \
-            echo "Running docformatter..." ; \
-            trap 'docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 ${MODIFIED_PY_FILES} || echo "docformatter returned status 3."' EXIT; \
-            echo "Running flake8..." ; \
-            flake8 --ignore=E203,E501,W503 ${MODIFIED_PY_FILES} ; \
-          fi
+          export BASE_BRANCH=${{ inputs.base_branch }}
+          python resolve.py
       shell: bash
