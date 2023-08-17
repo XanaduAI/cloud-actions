@@ -12,10 +12,6 @@ inputs:
   pr_title:
     description: SC formatted title of the PR.
     required: true
-  dev_branch:
-    description: The dev branch of this action to connect to the workflow.
-    required: false
-    default: 'main'
   changelog_path:
     description: Explicit path to the changelog file.
     require: false
