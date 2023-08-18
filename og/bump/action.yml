@@ -228,7 +228,7 @@ runs:
           changelog_file.write_text(
             "\n\n".join(
               [
-                f"# ${{ inputs.version_template }}\n\n{}".format(version, changelog[version])
+                "# ${{ inputs.version_template }}\n\n{}".format(version, changelog[version])
                 for version in sorted(changelog.keys(), key=semver.Version.parse, reverse=True)
               ]
             )
