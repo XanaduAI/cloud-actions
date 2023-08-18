@@ -19,7 +19,7 @@ inputs:
   version_template:
     description: Template for the version number to be added to the changelog file.
     requrie: false
-    default: "{}"
+    default: "v{}"
 
 
 runs:
@@ -141,7 +141,7 @@ runs:
           logger.info(f"Tagging new version: {new_ver}")
           ver_file.write_text(f'__version__ = "{leading_v}{new_ver}"\n')
 
-          return f"{leading_v}{new_ver}"
+          return new_ver
 
 
         def generate_changelog(version: str) -> None:
@@ -154,7 +154,6 @@ runs:
           Args:
             version (str): Semantic version to tag the CHANGELOG entry with.
           """
-          leading_v = 'v' if version.startswith('v') else ''
           # Get a list of users who have made a commit touching the changelog file in the current branch
           if changelog_file := "${{ inputs.changelog_path }}".strip():
             changelog_file = Path(changelog_file).resolve()
@@ -213,24 +212,24 @@ runs:
           )
           reg = re.compile(r"\#\s?v?\d+\.\d+\.\d+.*")
           changelog = {
-            k: v.strip()
+            k.removeprefix('#').strip().removeprefix('v'): v.strip()
             for k, v in zip(
-              map(lambda v: v.removeprefix('#').strip().removeprefix('v'), re.findall(reg, base_changelog)), re.split(reg, base_changelog)[1:]
+              re.findall(reg, base_changelog), re.split(reg, base_changelog)[1:]
             )
           }
           pr_number = "${{ github.event.pull_request.number }}"
           github_repository = os.environ["GITHUB_REPOSITORY"]
-          version = "${{ inputs.version_template }}".strip().format(version)
 
           if changelog.get(version) != pr_description:
             changelog[
               version
             ] = f"[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}"
 
+          formatted_version = "${{ inputs.version_template }}".format(version)
           changelog_file.write_text(
             "\n\n".join(
               [
-                f"# {leading_v}{version}\n\n{changelog[version]}"
+                f"# {formatted_version}\n\n{changelog[version]}"
                 for version in sorted(changelog.keys(), key=semver.Version.parse, reverse=True)
               ]
             )
