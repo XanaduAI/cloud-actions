@@ -225,11 +225,10 @@ runs:
               version
             ] = f"[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}"
 
-          formatted_version = "${{ inputs.version_template }}".format(version)
           changelog_file.write_text(
             "\n\n".join(
               [
-                f"# {formatted_version}\n\n{changelog[version]}"
+                f"# ${{ inputs.version_template }}\n\n{changelog[version]}".format(version)
                 for version in sorted(changelog.keys(), key=semver.Version.parse, reverse=True)
               ]
             )
