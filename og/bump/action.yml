@@ -67,7 +67,7 @@ runs:
         def bump() -> str:
             """Update the version file and return the version number.
 
-            This function will update the version file only and only if the file was not
+            This function will update the version file if and only if the file was not
             touched by anyone other than the bot going back as far as base branch. Always
             returns the head (semantic) version.
 
