@@ -5,9 +5,6 @@ inputs:
   key:
     description: QUBOT SSH Key
     required: true
-  repository:
-    description: name of the repository
-    required: true
   path:
     description: The path for unit tests
     required: false
@@ -24,6 +21,6 @@ runs:
       shell: bash
 
     - run: |
-        COV="$(echo ${{ inputs.repository }} | cut -d '/' -f2 | sed 's/-/_/g')"
+        COV="$(echo ${{ github.repository }} | cut -d '/' -f2 | sed 's/-/_/g')"
         python -m pytest ${{ inputs.path }} --showlocals --full-trace --cov=${COV} --cov-report xml:coverage.xml --cov-report term-missing --junitxml junit.xml
       shell: bash
