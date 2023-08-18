@@ -141,7 +141,7 @@ runs:
           logger.info(f"Tagging new version: {new_ver}")
           ver_file.write_text(f'__version__ = "{leading_v}{new_ver}"\n')
 
-          return new_ver
+          return str(new_ver)
 
 
         def generate_changelog(version: str) -> None:
