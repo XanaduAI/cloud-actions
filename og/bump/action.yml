@@ -203,11 +203,11 @@ runs:
             .split("**Version information (please select exactly one):**")[0]
             .strip()
           )
-          reg = re.compile(r"\#\s?v?\d+\.\d+\.\d+.*")
+          reg = re.compile(r"\#\s?v?(\d+\.\d+\.\d+).*")
           changelog = {
-            k.removeprefix('#').strip().removeprefix('v'): v.strip()
+            k: v.strip()
             for k, v in zip(
-              re.findall(reg, base_changelog), re.split(reg, base_changelog)[1:]
+              re.findall(reg, base_changelog), re.split(reg, base_changelog)[2::2]
             )
           }
           pr_number = "${{ github.event.pull_request.number }}"
