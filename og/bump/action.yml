@@ -154,6 +154,7 @@ runs:
             Args:
                 version (str): Semantic version to tag the CHANGELOG entry with.
             """
+            leading_v = 'v' if version.startswith('v') else ''
             # Get a list of users who have made a commit touching the changelog file in the current branch
             if changelog_file := "${{ inputs.changelog_path }}".strip():
                 changelog_file = Path(changelog_file).resolve()
@@ -214,7 +215,7 @@ runs:
             changelog = {
                 k: v.strip()
                 for k, v in zip(
-                    re.findall(reg, base_changelog), re.split(reg, base_changelog)[1:]
+                    map(lambda v: v.removeprefix('#').strip().removeprefix('v'), re.findall(reg, base_changelog)), re.split(reg, base_changelog)[1:]
                 )
             }
             pr_number = "${{ github.event.pull_request.number }}"
@@ -229,8 +230,8 @@ runs:
             changelog_file.write_text(
                 "\n\n".join(
                     [
-                        f"{version}\n\n{changelog[version]}"
-                        for version in sorted(changelog.keys(), reverse=True)
+                        f"# {leading_v}{version}\n\n{changelog[version]}"
+                        for version in sorted(changelog.keys(), key=semver.Version.parse, reverse=True)
                     ]
                 )
             )
