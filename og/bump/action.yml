@@ -211,7 +211,7 @@ runs:
             )
           }
           pr_number = "${{ github.event.pull_request.number }}"
-          github_repository = os.environ["GITHUB_REPOSITORY"]
+          github_repository = "${{ github.repository }}"
 
           if changelog.get(version) != pr_description:
             changelog[
