@@ -2,11 +2,6 @@ name: lint
 description: |
   Run formatters/linters to OG specifications
 
-inputs:
-  base_branch:
-    description: The base branch of the PR.
-    required: true
-
 runs:
   using: "composite"
   steps:
@@ -36,7 +31,7 @@ runs:
           edited_py_files = {
             _file
             for file in subprocess.run(
-              f"git diff origin/${{ inputs.base_branch }} --diff-filter=MAC --name-only",
+              f"git diff origin/${{ github.base_ref }} --diff-filter=MAC --name-only",
               shell=True,
               stdout=subprocess.PIPE,
               encoding="utf-8",
