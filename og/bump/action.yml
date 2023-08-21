@@ -105,7 +105,7 @@ runs:
               logger.warn(
                 "Detected non bot commits to the version file, skipping version bump."
               )
-              return f"{leading_v}{file_ver}"
+              return str(file_ver)
 
           logger.info(f"{file_ver=} {base_branch_ver=}")
 
