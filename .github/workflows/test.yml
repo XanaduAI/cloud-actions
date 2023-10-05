@@ -9,7 +9,7 @@ jobs:
     steps:
       - name: Generate Tags
         id: tags
-        uses: XanaduAI/cloud-actions/generate-docker-image-tags@v1.5.4
+        uses: ./generate-docker-image-tags
 
       - name: Display Tags
         run: |
