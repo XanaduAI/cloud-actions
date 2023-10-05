@@ -1,0 +1,16 @@
+name: Test
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate Tags
+        id: tags
+        uses: XanaduAI/cloud-actions/generate-docker-image-tags@v1.5.4
+
+      - name: Display Tags
+        run: |
+          echo ${{ steps.tags.outputs.tags }}
