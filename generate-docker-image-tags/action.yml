@@ -61,20 +61,20 @@ runs:
           TAGS="${{ inputs.prefix }}.$SLASHLESS_BRANCH,${{ inputs.prefix }}.$COMMIT_SHA"
         fi
 
-        # if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
-        # then
-        #   PR_NUMBER="${{ github.event.number }}"
-        # elif [ "$GITHUB_EVENT_NAME" == "push" ]
-        # then
-        # Workflow was triggered by a "push" event.
-        PR_NUMBER=$( \
-          (echo '${{ github.event.pull_request.title }}' \
-          | grep -o "\(#[0-9]\+\)" || true) \
-          | sed "s/[#()]//g" \
-        )
-        # else
-        #   PR_NUMBER=""
-        # fi
+        if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
+        then
+          PR_NUMBER="${{ github.event.number }}"
+        elif [ "$GITHUB_EVENT_NAME" == "push" ]
+        then
+          # Workflow was triggered by a "push" event.
+          PR_NUMBER=$( \
+            (echo '${{ github.event.head_commit.message }}' \
+            | grep -o "\(#[0-9]\+\)" || true) \
+            | sed "s/[#()]//g" \
+          )
+        else
+          PR_NUMBER=""
+        fi
 
         # Add additional tags for each Story ID associated with this PR.
         if [ ! -z "$PR_NUMBER" ] && [ ! -z "${{ inputs.shortcut-api-token }}" ]; then
