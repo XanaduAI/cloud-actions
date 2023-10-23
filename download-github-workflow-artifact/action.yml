@@ -4,6 +4,14 @@ description: |
   Has a built-in retry mechanism with exponential backoff.
 
 inputs:
+  owner:
+    description: The owner of the repository containing the workflow
+    required: false
+    default: context.repo.owner
+  repo:
+    description: The name of the repository containing the workflow without the .git extension
+    required: false
+    default: context.repo.repo
   workflow_run_id:
     description: The workflow run id from which to download the artifacts
     required: true
@@ -34,7 +42,9 @@ runs:
         github-token: ${{ inputs.github_token }}
         script: |
           const script = require('${{ github.action_path }}/download.js');
-          await script({github, context}, 
+          await script({github}, 
+                      ${{ inputs.owner }}, 
+                      ${{ inputs.repo }}, 
                       ${{ inputs.workflow_run_id }}, 
                       "${{ inputs.artifact_name_regex }}", 
                       "${{ inputs.artifact_download_dir }}",
