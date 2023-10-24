@@ -57,10 +57,13 @@ The following code snippet get the most recent successful build of a workflow, t
 
       return workflowRunsSorted[0].id
 ```
-And now you can use the output of this step to call this action:
+And now you can use the output of this step to call this action. If the artifact is from another repository,
+the `owner` and `repo` parameters must be set:
 ```yaml
 - uses: XanaduAI/cloud-actions/download-github-workflow-artifact@main
   with:
+    owner: context.repo.owner
+    repo: context.repo.repo
     workflow_run_id: ${{ steps.workflow_run_id.outputs.result }}
     github_token: ${{ github.token }}
 ```
