@@ -7,11 +7,11 @@ inputs:
   owner:
     description: The owner of the repository containing the workflow
     required: false
-    default: context.repo.owner
+    default: ''
   repo:
     description: The name of the repository containing the workflow without the .git extension
     required: false
-    default: context.repo.repo
+    default: ''
   workflow_run_id:
     description: The workflow run id from which to download the artifacts
     required: true
@@ -41,10 +41,12 @@ runs:
       with:
         github-token: ${{ inputs.github_token }}
         script: |
+          const repoOwner = "${{ inputs.owner }}" || context.repo.owner;
+          const repoName = "${{ inputs.repo }}" || context.repo.repo;
           const script = require('${{ github.action_path }}/download.js');
           await script({github}, 
-                      ${{ inputs.owner }}, 
-                      ${{ inputs.repo }}, 
+                      repoOwner, 
+                      repoName, 
                       ${{ inputs.workflow_run_id }}, 
                       "${{ inputs.artifact_name_regex }}", 
                       "${{ inputs.artifact_download_dir }}",
