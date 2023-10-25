@@ -58,7 +58,7 @@ The following code snippet get the most recent successful build of a workflow, t
       return workflowRunsSorted[0].id
 ```
 And now you can use the output of this step to call this action. If the artifact is from another repository,
-the `owner` and `repo` parameters must be set to point to the repository from which
+the `repository_owner` and `repository_name` parameters must be set to point to the repository from which
 to download the artifact:
 ```yaml
 - id: repo_information
