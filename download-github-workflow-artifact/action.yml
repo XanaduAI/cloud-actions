@@ -4,11 +4,11 @@ description: |
   Has a built-in retry mechanism with exponential backoff.
 
 inputs:
-  owner:
+  repository_owner:
     description: The owner of the repository containing the workflow
     required: false
     default: ''
-  repo:
+  repository_name:
     description: The name of the repository containing the workflow without the .git extension
     required: false
     default: ''
@@ -41,8 +41,8 @@ runs:
       with:
         github-token: ${{ inputs.github_token }}
         script: |
-          const repoOwner = "${{ inputs.owner }}" || context.repo.owner;
-          const repoName = "${{ inputs.repo }}" || context.repo.repo;
+          const repoOwner = "${{ inputs.repository_owner }}" || context.repo.owner;
+          const repoName = "${{ inputs.repository_name }}" || context.repo.repo;
           const script = require('${{ github.action_path }}/download.js');
           await script({github}, 
                       repoOwner, 

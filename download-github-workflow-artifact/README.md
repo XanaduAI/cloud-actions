@@ -68,8 +68,8 @@ to download the artifact:
    
 - uses: XanaduAI/cloud-actions/download-github-workflow-artifact@main
   with:
-    owner: ${{ steps.repo_information.outputs.owner }}
-    repo: ${{ steps.repo_information.outputs.name }}
+    repository_owner: ${{ steps.repo_information.outputs.owner }}
+    repository_name: ${{ steps.repo_information.outputs.name }}
     workflow_run_id: ${{ steps.workflow_run_id.outputs.result }}
     github_token: ${{ github.token }}
 ```
