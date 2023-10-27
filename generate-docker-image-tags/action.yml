@@ -91,7 +91,7 @@ runs:
         32
         "
 
-        TAGS=","
+        TAGS=""
         while read -r id; do
           if [ ! -z "$id" ]; then
             TAGS+="sc-$id,"
