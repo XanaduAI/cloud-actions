@@ -62,6 +62,8 @@ runs:
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
+        echo "Repo is $GITHUB_REPOSITORY"
+        echo "SHA is $GITHUB_SHA"
         PR_NUMBER=$(
           gh api \
             -H "Accept: application/vnd.github+json" \
