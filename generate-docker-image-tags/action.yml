@@ -14,13 +14,20 @@ description: Generate a list of Docker image tags for the current workflow.
 #      tags: {latest, main, 425840e}
 
 inputs:
+  github-token:
+    description: >
+      GitHub Token for fetching PR numbers associated with commits.
+      Required if `shortcut-api-token` is used.
+    required: false
   shortcut-api-token:
-    description: Shortcut API token for fetching Story IDs related to a PR.
+    description: >
+      Shortcut API token for fetching Story IDs related to a PR.
     required: false
   prefix:
-    description: |
-      The prefix for tagging commits that are not yet merged to main/master.
-      For example: a PR from some-branch would receive the tags <prefix>.some-branch, <prefix>.<COMMIT_SHA>.
+    description: >
+      Prefix for tagging commits that are not yet merged to main/master.
+      For example, a PR from some-branch would receive tags "<prefix>.some-branch"
+      and "<prefix>.<COMMIT_SHA>".
     required: false
     default: temp
 
@@ -50,9 +57,9 @@ runs:
 
     - id: get-pr-number
       shell: bash
-      # if: inputs.shortcut-api-token
+      if: ${{ inputs.github-token && inputs.shortcut-api-token }}
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
       run: |
         PR_NUMBER=$(
           gh api \
@@ -67,7 +74,7 @@ runs:
 
     - id: get-story-tags
       shell: bash
-      # if: inputs.shortcut-api-token
+      if: ${{ inputs.github-token && inputs.shortcut-api-token }}
       run: |
         PR_NUMBER=${{ steps.get-pr-number.outputs.pr-number }}
         url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
