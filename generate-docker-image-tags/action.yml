@@ -45,6 +45,7 @@ runs:
           printf 'Cannot determine tags: Workflow must be triggered by "push", "pull_request", or "release" event.' && exit 1
         fi
 
+        echo "Branch is '$BRANCH'."
         echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
     - id: get-pr-number
@@ -97,7 +98,6 @@ runs:
 
     - id: get-branch-tags
       shell: bash
-      if: inputs.shortcut-api-token
       run: |
         BRANCH=${{ steps.get-branch.outputs.branch }}
         COMMIT_SHA=${GITHUB_SHA:0:7}
