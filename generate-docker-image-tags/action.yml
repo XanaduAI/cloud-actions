@@ -93,7 +93,7 @@ runs:
           fi
         done <<< "$ids"
 
-        echo "Story tags are '$TAGS'."
+        echo "Story tags are '$TAGS[@]'."
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
     - id: get-branch-tags
@@ -110,7 +110,7 @@ runs:
           TAGS=("${{ inputs.prefix }}.$SLASHLESS_BRANCH" "${{ inputs.prefix }}.$COMMIT_SHA")
         fi
 
-        echo "Branch tags are '$TAGS'."
+        echo "Branch tags are '$TAGS[@]'."
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
     - id: get-tags
