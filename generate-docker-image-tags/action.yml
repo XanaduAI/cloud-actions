@@ -14,15 +14,9 @@ description: Generate a list of Docker image tags for the current workflow.
 #      tags: {latest, main, 425840e}
 
 inputs:
-  github-token:
-    description: >
-      GitHub token for fetching PR numbers associated with commits.
-      Required if `shortcut-api-token` is specified.
-    required: false
   shortcut-api-token:
     description: >
       Shortcut API token for fetching Story IDs related to a PR.
-      Requires `github-token` to be specified.
     required: false
   prefix:
     description: >
@@ -35,12 +29,13 @@ inputs:
 outputs:
   tags:
     description: Comma-separated list of tags.
-    value: ${{ steps.get-tags.outputs.tags }}
+    value: ${{ steps.get-all-tags.outputs.tags }}
 
 runs:
   using: composite
   steps:
-    - id: get-branch
+    - name: Get Branch Name
+      id: get-branch
       shell: bash
       run: |
         if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
@@ -56,14 +51,17 @@ runs:
         echo "Branch is '$BRANCH'."
         echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
-    - id: get-sha
+    - name: Get Commit SHA
+      id: get-sha
       shell: bash
       run: |
         SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+        SHA=${SHA:0:7}
         echo "SHA is '$SHA'."
         echo "sha=$SHA" >> $GITHUB_OUTPUT
 
-    - id: get-pr-number
+    - name: Get PR Number
+      id: get-pr-number
       shell: bash
       if: inputs.shortcut-api-token
       env:
@@ -82,11 +80,12 @@ runs:
         echo "PR number is '$PR_NUMBER'."
         echo "pr-number=$PR_NUMBER" >> $GITHUB_OUTPUT
 
-    - id: get-story-tags
+    - name: Get Tags for Shortcut Stories
+      id: get-story-tags
       shell: bash
       if: inputs.shortcut-api-token
       run: |
-        PR_NUMBER=${{ steps.get-pr-number.outputs.pr-number }}
+        PR_NUMBER="${{ steps.get-pr-number.outputs.pr-number }}"
         url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
 
         ids=$(
@@ -111,7 +110,8 @@ runs:
         echo "Story tags are '$TAGS'."
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
-    - id: get-branch-tags
+    - name: Get Tags for Branch
+      id: get-branch-tags
       shell: bash
       run: |
         BRANCH="${{ steps.get-branch.outputs.branch }}"
@@ -129,7 +129,8 @@ runs:
         echo "Branch tags are '$TAGS'."
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
-    - id: get-tags
+    - name: Get All Tags
+      id: get-all-tags
       shell: bash
       run: |
         BRANCH_TAGS="${{ steps.get-branch-tags.outputs.tags }}"
