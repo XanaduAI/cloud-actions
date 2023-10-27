@@ -13,8 +13,6 @@ jobs:
       - name: Generate Tags
         id: tags
         uses: ./generate-docker-image-tags
-        with:
-            shortcut-api-token: "Some Invalid Token"
 
       - name: Display Tags
         run: |
