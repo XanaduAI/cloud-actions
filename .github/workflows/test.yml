@@ -13,6 +13,8 @@ jobs:
       - name: Generate Tags
         id: tags
         uses: ./generate-docker-image-tags
+        with:
+          shortcut-api-token: Mock
 
       - name: Display Tags
         run: |
