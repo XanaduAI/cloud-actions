@@ -56,19 +56,26 @@ runs:
         echo "Branch is '$BRANCH'."
         echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
+      - id: get-sha
+        shell: bash
+        run: |
+          SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+          echo "SHA is '$SHA'."
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+
     - id: get-pr-number
       shell: bash
       if: inputs.shortcut-api-token
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
-        echo "Repo is $GITHUB_REPOSITORY"
-        echo "SHA is $GITHUB_SHA"
+        SHA="${{ steps.get-sha.outputs.sha }}"
+
         PR_NUMBER=$(
           gh api \
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            /repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls \
+            /repos/$GITHUB_REPOSITORY/commits/$SHA/pulls \
             | jq -r ".[].number"
         )
 
@@ -107,15 +114,16 @@ runs:
     - id: get-branch-tags
       shell: bash
       run: |
-        BRANCH=${{ steps.get-branch.outputs.branch }}
-        COMMIT_SHA=${GITHUB_SHA:0:7}
+        BRANCH="${{ steps.get-branch.outputs.branch }}"
+        SHA="${{ steps.get-sha.outputs.sha }}"
+        SHA=${SHA:0:7}
 
         if [ "$BRANCH" == "main" ] || [ "$BRANCH" == "master" ]
         then
-          TAGS="latest,$BRANCH,$COMMIT_SHA"
+          TAGS="latest,$BRANCH,$SHA"
         else
           SLASHLESS_BRANCH=`echo $BRANCH | tr / -`
-          TAGS="${{ inputs.prefix }}.$SLASHLESS_BRANCH,${{ inputs.prefix }}.$COMMIT_SHA"
+          TAGS="${{ inputs.prefix }}.$SLASHLESS_BRANCH,${{ inputs.prefix }}.$SHA"
         fi
 
         echo "Branch tags are '$TAGS'."
@@ -124,8 +132,8 @@ runs:
     - id: get-tags
       shell: bash
       run: |
-        BRANCH_TAGS=${{ steps.get-branch-tags.outputs.tags }}
-        STORY_TAGS=${{ steps.get-story-tags.outputs.tags }}
+        BRANCH_TAGS="${{ steps.get-branch-tags.outputs.tags }}"
+        STORY_TAGS="${{ steps.get-story-tags.outputs.tags }}"
 
         TAGS="$BRANCH_TAGS,$STORY_TAGS"
         TAGS="${TAGS/%,/}"
