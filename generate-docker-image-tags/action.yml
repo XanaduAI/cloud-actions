@@ -86,14 +86,17 @@ runs:
           | jq ".stories.data[].id"
         )
 
-        TAGS=()
+        TAGS=","
         while read -r id; do
           if [ ! -z "$id" ]; then
-            TAGS+=( "sc-$id" )
+            TAGS+="sc-$id,"
           fi
         done <<< "$ids"
 
-        echo "Story tags are '${TAGS[@]}'."
+        # Remove the trailing comma.
+        TAGS="${TAGS::-1}"
+
+        echo "Story tags are '$TAGS'."
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
     - id: get-branch-tags
@@ -104,13 +107,13 @@ runs:
 
         if [ "$BRANCH" == "main" ] || [ "$BRANCH" == "master" ]
         then
-          TAGS=("latest" "$BRANCH" "$COMMIT_SHA")
+          TAGS="latest,$BRANCH,$COMMIT_SHA"
         else
           SLASHLESS_BRANCH=`echo $BRANCH | tr / -`
-          TAGS=("${{ inputs.prefix }}.$SLASHLESS_BRANCH" "${{ inputs.prefix }}.$COMMIT_SHA")
+          TAGS="${{ inputs.prefix }}.$SLASHLESS_BRANCH,${{ inputs.prefix }}.$COMMIT_SHA"
         fi
 
-        echo "Branch tags are '${TAGS[@]}'."
+        echo "Branch tags are '$TAGS'."
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
 
     - id: get-tags
@@ -119,8 +122,9 @@ runs:
         BRANCH_TAGS=${{ steps.get-branch-tags.outputs.branch }}
         STORY_TAGS=${{ steps.get-story-tags.outputs.branch }}
 
-        TAGS=("${BRANCH_TAGS[@]}" "${STORY_TAGS[@]}")
-        TAGS=$(IFS=, ; echo "${TAGS[@]}")
+        TAGS="$BRANCH_TAGS,$STORY_TAGS"
+        TAGS="${TAGS/%,//}"
+        TAGS="${TAGS/#,//}"
 
         echo "Tags are '$TAGS'."
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
