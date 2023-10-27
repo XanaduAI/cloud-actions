@@ -119,12 +119,12 @@ runs:
     - id: get-tags
       shell: bash
       run: |
-        BRANCH_TAGS=${{ steps.get-branch-tags.outputs.branch }}
-        STORY_TAGS=${{ steps.get-story-tags.outputs.branch }}
+        BRANCH_TAGS=${{ steps.get-branch-tags.outputs.tags }}
+        STORY_TAGS=${{ steps.get-story-tags.outputs.tags }}
 
         TAGS="$BRANCH_TAGS,$STORY_TAGS"
-        TAGS="${TAGS/%,//}"
-        TAGS="${TAGS/#,//}"
+        TAGS="${TAGS/%,/}"
+        TAGS="${TAGS/#,/}"
 
         echo "Tags are '$TAGS'."
         echo "tags=$TAGS" >> $GITHUB_OUTPUT
