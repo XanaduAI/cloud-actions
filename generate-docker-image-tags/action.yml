@@ -56,12 +56,12 @@ runs:
         echo "Branch is '$BRANCH'."
         echo "branch=$BRANCH" >> $GITHUB_OUTPUT
 
-      - id: get-sha
-        shell: bash
-        run: |
-          SHA="${{ github.event.pull_request.head.sha || github.sha }}"
-          echo "SHA is '$SHA'."
-          echo "sha=$SHA" >> $GITHUB_OUTPUT
+    - id: get-sha
+      shell: bash
+      run: |
+        SHA="${{ github.event.pull_request.head.sha || github.sha }}"
+        echo "SHA is '$SHA'."
+        echo "sha=$SHA" >> $GITHUB_OUTPUT
 
     - id: get-pr-number
       shell: bash
