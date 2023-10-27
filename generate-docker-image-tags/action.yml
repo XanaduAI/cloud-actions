@@ -58,9 +58,9 @@ runs:
 
     - id: get-pr-number
       shell: bash
-      if: ${{ inputs.github-token && inputs.shortcut-api-token }}
+      if: inputs.shortcut-api-token
       env:
-        GITHUB_TOKEN: ${{ inputs.github-token }}
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
         PR_NUMBER=$(
           gh api \
@@ -75,7 +75,7 @@ runs:
 
     - id: get-story-tags
       shell: bash
-      if: ${{ inputs.github-token && inputs.shortcut-api-token }}
+      if: inputs.shortcut-api-token
       run: |
         PR_NUMBER=${{ steps.get-pr-number.outputs.pr-number }}
         url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$PR_NUMBER"

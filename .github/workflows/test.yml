@@ -14,7 +14,6 @@ jobs:
         id: tags
         uses: ./generate-docker-image-tags
         with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
             shortcut-api-token: "Some Invalid Token"
 
       - name: Display Tags
