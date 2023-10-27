@@ -16,12 +16,13 @@ description: Generate a list of Docker image tags for the current workflow.
 inputs:
   github-token:
     description: >
-      GitHub Token for fetching PR numbers associated with commits.
-      Required if `shortcut-api-token` is used.
+      GitHub token for fetching PR numbers associated with commits.
+      Required if `shortcut-api-token` is specified.
     required: false
   shortcut-api-token:
     description: >
       Shortcut API token for fetching Story IDs related to a PR.
+      Requires `github-token` to be specified.
     required: false
   prefix:
     description: >
@@ -79,17 +80,14 @@ runs:
         PR_NUMBER=${{ steps.get-pr-number.outputs.pr-number }}
         url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
 
-        # ids=$(
-        #   curl --silent -X GET \
-        #   -H "Content-Type: application/json" \
-        #   -H "Shortcut-Token: ${{ inputs.shortcut-api-token }}" \
-        #   -d "{ \"page_size\": 20, \"query\": \"is:story and pr:$url\" }" \
-        #   -L "https://api.app.shortcut.com/api/v3/search" \
-        #   | jq ".stories.data[].id"
-        # )
-        ids="
-        12345
-        "
+        ids=$(
+          curl --silent -X GET \
+          -H "Content-Type: application/json" \
+          -H "Shortcut-Token: ${{ inputs.shortcut-api-token }}" \
+          -d "{ \"page_size\": 20, \"query\": \"is:story and pr:$url\" }" \
+          -L "https://api.app.shortcut.com/api/v3/search" \
+          | jq ".stories.data[].id"
+        )
 
         TAGS=""
         while read -r id; do
