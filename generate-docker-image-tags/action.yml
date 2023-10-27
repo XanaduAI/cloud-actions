@@ -50,7 +50,7 @@ runs:
 
     - id: get-pr-number
       shell: bash
-      if: inputs.shortcut-api-token
+      # if: inputs.shortcut-api-token
       run: |
         if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
         then
@@ -72,19 +72,24 @@ runs:
 
     - id: get-story-tags
       shell: bash
-      if: inputs.shortcut-api-token
+      # if: inputs.shortcut-api-token
       run: |
         PR_NUMBER=${{ steps.get-pr-number.outputs.pr-number }}
         url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
 
-        ids=$(
-          curl --silent -X GET \
-          -H "Content-Type: application/json" \
-          -H "Shortcut-Token: ${{ inputs.shortcut-api-token }}" \
-          -d "{ \"page_size\": 20, \"query\": \"is:story and pr:$url\" }" \
-          -L "https://api.app.shortcut.com/api/v3/search" \
-          | jq ".stories.data[].id"
-        )
+        # ids=$(
+        #   curl --silent -X GET \
+        #   -H "Content-Type: application/json" \
+        #   -H "Shortcut-Token: ${{ inputs.shortcut-api-token }}" \
+        #   -d "{ \"page_size\": 20, \"query\": \"is:story and pr:$url\" }" \
+        #   -L "https://api.app.shortcut.com/api/v3/search" \
+        #   | jq ".stories.data[].id"
+        # )
+        ids="
+        123
+        1
+        32
+        "
 
         TAGS=","
         while read -r id; do
