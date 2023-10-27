@@ -34,7 +34,7 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Get Branch Name
+    - name: Get Branch
       id: get-branch
       shell: bash
       run: |
@@ -63,7 +63,6 @@ runs:
     - name: Get PR Number
       id: get-pr-number
       shell: bash
-      if: inputs.shortcut-api-token
       env:
         GITHUB_TOKEN: ${{ github.token }}
       run: |
@@ -83,7 +82,7 @@ runs:
     - name: Get Tags for Shortcut Stories
       id: get-story-tags
       shell: bash
-      if: inputs.shortcut-api-token
+      if: ${{ inputs.shortcut-api-token && steps.get-pr-number.outputs.pr-number }}
       run: |
         PR_NUMBER="${{ steps.get-pr-number.outputs.pr-number }}"
         url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
@@ -116,7 +115,6 @@ runs:
       run: |
         BRANCH="${{ steps.get-branch.outputs.branch }}"
         SHA="${{ steps.get-sha.outputs.sha }}"
-        SHA=${SHA:0:7}
 
         if [ "$BRANCH" == "main" ] || [ "$BRANCH" == "master" ]
         then
