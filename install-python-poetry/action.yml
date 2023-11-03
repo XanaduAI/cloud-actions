@@ -1,0 +1,95 @@
+name: Install Python Poetry
+description: This action installs and sets up Python Poetry
+
+inputs:
+  poetry_version:
+    type: string
+    description: The version of poetry that will be installed. Omitting this input will install the latest version of poetry.
+    required: false
+    default: ''
+  poetry_home:
+    type: string
+    description: Set a custom directory for POETRY_HOME
+    required: false
+    default: ''
+  add_poetry_to_path:
+    type: boolean
+    description: Update PATH so `poetry` can be invoked directly. Defaults to true
+    required: false
+    default: true
+
+
+outputs:
+  poetry_home:
+    description: 'Path to directory where poetry is installed'
+    value: ${{ steps.poetry.outputs.home }}
+  poetry_bin:
+    description: 'Path to poetry binary'
+    value: ${{ steps.poetry.outputs.bin }}
+
+
+runs:
+  using: composite
+  steps:
+    - name: Check Python available
+      shell: bash
+      run: |
+        if ! command -v python &> /dev/null
+        then
+          echo "::error title=Missing Python::Could not find a python installation. Make sure to use actions/setup-python prior to calling this action."
+          exit 1
+        fi
+
+    # This step outputs `==<inputs.poetry_version>` only if a version is specified by the calling workflow.
+    # This is done so that if the calling workflow omits version, then the `Install Poetry` step renders to `pip install poetry`
+    # And if a version is specified, then that step would instead render to `pip install poetry==<inputs.poetry_version>`
+    - name: Check Poetry Version Input
+      shell: bash
+      id: poetry_version
+      if: inputs.poetry_version != ''
+      env:
+        INPUT_POETRY_VERSION: ${{ inputs.poetry_version }}
+      run: echo "version===$INPUT_POETRY_VERSION" >> $GITHUB_OUTPUT
+
+    - name: Setup POETRY_HOME
+      shell: bash
+      id: poetry_home
+      env:
+        INPUT_POETRY_HOME: ${{ inputs.poetry_home }}
+      run: |
+        if [ "$INPUT_POETRY_HOME" == "" ]; then
+          poetry_home=$(mktemp -d)
+        else
+          poetry_home=$INPUT_POETRY_HOME
+        fi
+        echo "poetry_home=$poetry_home" >> $GITHUB_OUTPUT
+
+
+    - name: Install Poetry
+      id: poetry
+      shell: bash
+      env:
+        POETRY_HOME: ${{ steps.poetry_home.outputs.poetry_home }}
+      run: |
+        python3 -m venv $POETRY_HOME
+        $POETRY_HOME/bin/python -m pip install poetry${{ steps.poetry_version.outputs.version }}
+        
+        echo "home=$POETRY_HOME" >> $GITHUB_OUTPUT
+        echo "bin=$POETRY_HOME/bin/poetry" >> $GITHUB_OUTPUT
+
+    - name: Validate Poetry Installation
+      shell: bash
+      run: ${{ steps.poetry.outputs.home }}/bin/poetry --version
+
+    # This step symlinks the poetry binary to /usr/local/bin/poetry
+    # The reason for doing this instead of pre-pending the directory to GITHUB_PATH is so that
+    # the python binary being used by the calling workflow is not altered.
+    # If this step did `echo '/path/to/poetry/bin' >> GITHUB_PATH` .. that /bin would also contain a python
+    # binary, and if the calling workflow used python commands after installing poetry, they may use the wrong
+    # python binary without knowing it.
+    # This avoids that situation by not updating PATH.
+    - name: Add to PATH
+      if: inputs.add_poetry_to_path == 'true'
+      shell: bash
+      run: |
+        ln -sf ${{ steps.poetry.outputs.home }}/bin/poetry /usr/local/bin/poetry
