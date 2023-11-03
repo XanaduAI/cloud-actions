@@ -40,6 +40,9 @@ runs:
           exit 1
         fi
 
+    # This step outputs `==<inputs.poetry_version>` only if a version is specified by the calling workflow.
+    # This is done so that if the calling workflow omits version, then the `Install Poetry` step renders to `pip install poetry`
+    # And if a version is specified, then that step would instead render to `pip install poetry==<inputs.poetry_version>`
     - name: Check Poetry Version Input
       shell: bash
       id: poetry_version
