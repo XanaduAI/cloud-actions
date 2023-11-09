@@ -73,7 +73,7 @@ runs:
             -H "Accept: application/vnd.github+json" \
             -H "X-GitHub-Api-Version: 2022-11-28" \
             /repos/$GITHUB_REPOSITORY/commits/$SHA/pulls \
-            | jq -r ".[].number"
+            | jq -r ".[].number" | head -n 1
         )
 
         echo "PR number is '$PR_NUMBER'."
