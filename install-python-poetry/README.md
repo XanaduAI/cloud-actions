@@ -58,6 +58,38 @@ If this is set to false, you have to invoke poetry by calling the binary directl
 - run: ${{ steps.setup_poetry.outputs.poetry_bin }} --version
 ```
 
+## Using this action with Windows Runners
+There are no differences on how this called action is called from Windows,
+however, in order to use the poetry installation, ensure that you are running
+in a `bash` shell for any subsequent steps that use it.
+
+```yaml
+# (On a windows-latest runner)
+- uses: actions/checkout@v4
+- uses: actions/setup-python@v4
+- uses: XanaduAI/cloud-actions/install-python-poetry@main
+
+# This does not work
+- run: poetry --version
+
+# This does work
+- shell: bash
+  run: poetry --version
+```
+
+Even if you opt to not add poetry to PATH, within Windows, the shell needs
+to be bash in order to invoke the binary.
+```yaml
+- uses: XanaduAI/cloud-actions/install-python-poetry@main
+  id: setup_poetry
+  with:
+    poetry_version: 1.6.2
+    poetry_home: C:\\Users\\Me\\Documents\\poetry
+    add_poetry_to_path: false
+
+- shell: bash  
+  run: ${{ steps.setup_poetry.outputs.poetry_bin }} --version
+```
 
 ## Outputs:
 
