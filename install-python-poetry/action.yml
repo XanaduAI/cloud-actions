@@ -64,22 +64,31 @@ runs:
         fi
         echo "poetry_home=$poetry_home" >> $GITHUB_OUTPUT
 
+    - name: Setup Python venv
+      id: python_venv
+      shell: bash
+      run: python3 -m venv "${{ steps.poetry_home.outputs.poetry_home }}"
 
     - name: Install Poetry
       id: poetry
       shell: bash
       env:
         POETRY_HOME: ${{ steps.poetry_home.outputs.poetry_home }}
+        RUNNER_OS_WINDOWS: ${{ runner.os == 'Windows' }}
       run: |
-        python3 -m venv $POETRY_HOME
-        $POETRY_HOME/bin/python -m pip install poetry${{ steps.poetry_version.outputs.version }}
+        if [ "$RUNNER_OS_WINDOWS" == 'true' ]; then
+          PYTHON_BIN_DIR="$POETRY_HOME/Scripts"
+        else
+          PYTHON_BIN_DIR="$POETRY_HOME/bin"
+        fi
+        "$PYTHON_BIN_DIR/python" -m pip install poetry${{ steps.poetry_version.outputs.version }}
         
         echo "home=$POETRY_HOME" >> $GITHUB_OUTPUT
-        echo "bin=$POETRY_HOME/bin/poetry" >> $GITHUB_OUTPUT
+        echo "bin=$PYTHON_BIN_DIR/poetry" >> $GITHUB_OUTPUT
 
     - name: Validate Poetry Installation
       shell: bash
-      run: ${{ steps.poetry.outputs.home }}/bin/poetry --version
+      run: ${{ steps.poetry.outputs.bin }} --version
 
     # This step symlinks the poetry binary to /usr/local/bin/poetry
     # The reason for doing this instead of pre-pending the directory to GITHUB_PATH is so that
@@ -91,5 +100,11 @@ runs:
     - name: Add to PATH
       if: inputs.add_poetry_to_path == 'true'
       shell: bash
+      env:
+        RUNNER_OS_WINDOWS: ${{ runner.os == 'Windows' }}
       run: |
-        ln -sf ${{ steps.poetry.outputs.home }}/bin/poetry /usr/local/bin/poetry
+        if [ "$RUNNER_OS_WINDOWS" == 'true' ]; then
+          mklink "${{ steps.poetry.outputs.bin }}" "C:\\Windows\\System32\\poetry"
+        else
+          ln -sf ${{ steps.poetry.outputs.home }}/bin/poetry /usr/local/bin/poetry
+        fi
