@@ -104,7 +104,8 @@ runs:
         RUNNER_OS_WINDOWS: ${{ runner.os == 'Windows' }}
       run: |
         if [ "$RUNNER_OS_WINDOWS" == 'true' ]; then
-          mklink "${{ steps.poetry.outputs.bin }}" "C:\\Windows\\System32\\poetry"
+          SYMLINK_TARGET='C:\\Windows\\System32\\poetry'
         else
-          ln -sf ${{ steps.poetry.outputs.home }}/bin/poetry /usr/local/bin/poetry
+          SYMLINK_TARGET='/usr/local/bin/poetry'
         fi
+        ln -sf "${{ steps.poetry.outputs.bin }}" "$SYMLINK_TARGET"
