@@ -147,7 +147,6 @@ runs:
           Args:
             version (str): Semantic version to tag the CHANGELOG entry with.
           """
-          # Get a list of users who have made a commit touching the changelog file in the current branch
           if changelog_file := "${{ inputs.changelog_path }}".strip():
             changelog_file = Path(changelog_file).resolve()
           else:
@@ -162,6 +161,7 @@ runs:
           if not changelog_file.is_file():
             changelog_file.touch()
 
+          # Get a list of users who have made a commit touching the changelog file in the current branch
           committers = subprocess.run(
             f'git log {current_branch} --not origin/{base_branch} --pretty=format:"%an" -- {changelog_file.relative_to(pkg_base)}',
             **subprocess_kwargs,
@@ -219,12 +219,14 @@ runs:
             ] = f"[#{pr_number}](https://github.com/{github_repository}/pull/{pr_number}) {pr_description}"
 
           changelog_file.write_text(
-            "\n\n".join(
-              [
-                "# ${{ inputs.version_template }}\n\n{}".format(version, changelog[version])
-                for version in sorted(changelog.keys(), key=semver.Version.parse, reverse=True)
-              ]
-            )
+            (
+              "\n\n".join(
+                [
+                  "# ${{ inputs.version_template }}\n\n{}".format(version, changelog[version])
+                  for version in sorted(changelog.keys(), key=semver.Version.parse, reverse=True)
+                ]
+              )
+            ).strip() + "\n"
           )
 
         if __name__ == "__main__":
