@@ -6,12 +6,11 @@ inputs:
   changelog_path:
     description: Explicit path to the changelog file.
     require: false
-    default: ''
+    default: ""
   version_template:
     description: Template for the version number to be added to the changelog file.
     requrie: false
     default: "v{}"
-
 
 runs:
   using: "composite"
@@ -19,13 +18,26 @@ runs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
-        fetch-depth: 0
-        ref: "${{ github.head_ref }}"
+        ref: ${{ github.head_ref }}
+
+    - name: "Fetch full PR commit history"
+      env:
+        branch_base: origin/${{ github.event.pull_request.base.ref }}
+        branch_pr: origin/${{ github.event.pull_request.head.ref }}
+        refspec_base: +${{ github.event.pull_request.base.sha }}:remotes/origin/${{ github.event.pull_request.base.ref }}
+        refspec_pr: +${{ github.event.pull_request.head.sha }}:remotes/origin/${{ github.event.pull_request.head.ref }}
+      run: |
+        # Fetch enough history to find a common ancestor commit (aka merge-base):
+        git fetch origin ${{ env.refspec_pr }} --depth=$(( ${{ github.event.pull_request.commits }} + 1 )) \
+          --no-tags --prune --no-recurse-submodules
+
+        # Fetch most recent commit from pr base branch (for getting latest version number)
+        git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin ${{ github.base_ref }}
 
     - name: Install semver
       run: python3 -m pip install semver
       shell: bash
-        
+
     - name: Run the main logic
       shell: python
       run: |
