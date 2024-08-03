@@ -112,7 +112,7 @@ runs:
           non_bot_committers = filter(lambda x: "bot" not in x.lower().split(" "), committers)
 
           if any(non_bot_committers) and semver.compare(base_branch_ver, file_ver) == -1:
-              logger.warn(
+              logger.warning(
                 "Detected non bot commits to the version file, skipping version bump."
               )
               return str(file_ver)
