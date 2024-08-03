@@ -21,6 +21,7 @@ runs:
         ref: ${{ github.head_ref }}
 
     - name: "Fetch full PR commit history"
+      shell: bash
       env:
         branch_base: origin/${{ github.event.pull_request.base.ref }}
         branch_pr: origin/${{ github.event.pull_request.head.ref }}
