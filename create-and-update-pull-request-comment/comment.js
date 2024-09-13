@@ -1,7 +1,10 @@
-module.exports = async ({github, context}, prNumber, commentUid, commentBody) => {
+module.exports = async ({github, context}, prNumber, repositoryOwner, repositoryName, commentUid, commentBody) => {
     // Static User ID of the GitHub Actions Bot
     // Sample Reference: https://github.com/orgs/community/discussions/26560
     const actionsBotUserId = 41898282;
+
+    const repository_owner = repositoryOwner || context.repo.owner;
+    const repository_name = repositoryName || context.repo.repo;
 
     const commentHeader = `<!-- ${commentUid} -->`;
     const commentContent = `${commentBody}\n${commentHeader}`;
@@ -9,8 +12,8 @@ module.exports = async ({github, context}, prNumber, commentUid, commentBody) =>
 
     if (commentUid) {
       const opts = github.rest.issues.listComments.endpoint.merge({
-          owner: context.repo.owner,
-          repo: context.repo.repo,
+          owner: repository_owner,
+          repo: repository_name,
           issue_number: prNumber
       });
       const comments = await github.paginate(opts);
@@ -20,8 +23,8 @@ module.exports = async ({github, context}, prNumber, commentUid, commentBody) =>
 
       if (botComment) {
         await github.rest.issues.updateComment({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
+            owner: repository_owner,
+            repo: repository_name,
             comment_id: botComment.id,
             body: commentContent
         });
@@ -31,8 +34,8 @@ module.exports = async ({github, context}, prNumber, commentUid, commentBody) =>
     }
 
     await github.rest.issues.createComment({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
+        owner: repository_owner,
+        repo: repository_name,
         issue_number: prNumber,
         body: commentContent
     });
