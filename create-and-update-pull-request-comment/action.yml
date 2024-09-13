@@ -18,6 +18,8 @@ inputs:
     description: |
       The name of the repository where the pull request is located.
       If omitted, the current repository name that the action is running from is used.
+
+      This can also be the full name of the repository in the format `owner/repo`. If this is provided, `repository_owner` is ignored.
     required: false
     default: ''
   comment_uid:
