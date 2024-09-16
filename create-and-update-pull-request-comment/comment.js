@@ -3,7 +3,7 @@ module.exports = async ({github, context}, prNumber, repositoryOwner, repository
     // Sample Reference: https://github.com/orgs/community/discussions/26560
     const actionsBotUserId = 41898282;
 
-    const { repository_owner, repository_name } = (repositoryName && repositoryName.includes('/')) ? repositoryName.split('/', 2) : [
+    const [ repository_owner, repository_name ] = (repositoryName && repositoryName.includes('/')) ? repositoryName.split('/', 2) : [
       repositoryOwner || context.repo.owner,
       repositoryName || context.repo.repo
     ];
