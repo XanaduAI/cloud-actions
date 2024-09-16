@@ -7,6 +7,8 @@ module.exports = async ({github, context}, prNumber, repositoryOwner, repository
       repositoryOwner || context.repo.owner,
       repositoryName || context.repo.repo
     ];
+  console.log(`${repository_owner} - ${context.repo.owner}`);
+  console.log(`${repository_name} - ${context.repo.repo}`)
 
     const commentHeader = `<!-- ${commentUid} -->`;
     const commentContent = `${commentBody}\n${commentHeader}`;
