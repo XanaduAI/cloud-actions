@@ -8,6 +8,20 @@ inputs:
   pull_request_number:
     description: The pull request number on which a comment needs to be added or updated
     required: true
+  repository_owner:
+    description: |
+      The owner of the repository where the pull request is located.
+      If omitted, the current repository owner that the action is running from is used.
+    required: false
+    default: ''
+  repository_name:
+    description: |
+      The name of the repository where the pull request is located.
+      If omitted, the current repository name that the action is running from is used.
+
+      This can also be the full name of the repository in the format `owner/repo`. If this is provided, `repository_owner` is ignored.
+    required: false
+    default: ''
   comment_uid:
     description: |
       A Unique identifier to use to track a pinned comment. Can be set to an arbitrary value.
@@ -32,4 +46,9 @@ runs:
         github-token: ${{ inputs.github_token }}
         script: |
           const script = require('${{ github.action_path }}/comment.js');
-          await script({github, context}, ${{ inputs.pull_request_number }}, "${{ inputs.comment_uid }}", `${{ inputs.comment_body }}`);
+          await script({github, context},
+                       ${{ inputs.pull_request_number }},
+                      "${{ inputs.repository_owner }}",
+                      "${{ inputs.repository_name }}",
+                      "${{ inputs.comment_uid }}",
+                      `${{ inputs.comment_body }}`);
