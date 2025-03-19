@@ -4,8 +4,9 @@ description: Checks if a PR is a fork and applies an external label accordingly
 runs:
   using: composite
   steps:
-  - name: Check PR and label
-    run: |
-          if [ '${{ github.event.pull_request.head.repo.fork}}'=='false' ]; then 
-              gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"; 
-          fi 
+    - name: Check if fork
+      shell: bash
+      run: |
+            if [ '${{ github.event.pull_request.head.repo.fork}}'=='false' ]; then 
+                gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"; 
+            fi 
