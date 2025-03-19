@@ -1,0 +1,10 @@
+name: Label External Pull Requests
+description: Checks if a PR is a fork and applies an external label accordingly
+
+runs:
+  using: composite
+  steps:
+    - name: Check Branch and label
+      shell: bash
+      run: if [github.event.pull_request.head.repo.fork==true]; then 
+          gh issue edit $GITHUB_EVENT_PATH --add-label "External"; fi
