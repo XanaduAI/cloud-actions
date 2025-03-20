@@ -16,9 +16,9 @@ runs:
     
     - uses: actions/github-script@v7
       id: set-result
-      with:
+      with: #/orgs/PennyLaneAI/teams/external-collaborators/members
         script: |
-          return github.rest.issues.get({
+          return github.rest.issues.organizations.members({
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
@@ -26,4 +26,4 @@ runs:
         result-encoding: json
     - name: Get result
       shell: bash
-      run: echo "${{ github.actor }} ${{steps.set-result.outputs.result.data.user.login}} ${{steps.set-result.outputs.result.data.user.url}}"
+      run: echo "${{ github.actor }}"
