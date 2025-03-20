@@ -18,12 +18,10 @@ runs:
       id: set-result
       with: #/orgs/PennyLaneAI/teams/external-collaborators/members
         script: |
-          return github.rest.organizations.members({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
+          return github.rest.teams.listMembersInOrg({
+            org: "PennyLaneAI",
+            team_slug: "external-collaborators",
               })
-        result-encoding: json
     - name: Get result
       shell: bash
       run: echo "${{ github.actor }} ${{steps.set-result.outputs.result}}"
