@@ -20,4 +20,5 @@ runs:
         script: return "Hello!"
         result-encoding: string
     - name: Get result
+      shell: bash
       run: echo "${{steps.set-result.outputs.result}}"
