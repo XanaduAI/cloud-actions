@@ -23,7 +23,7 @@ runs:
             owner: context.repo.owner,
             repo: context.repo.repo,
               })
-        result-encoding: string
+        result-encoding: json
     - name: Get result
       shell: bash
       run: echo "${{ github.actor }} ${{steps.set-result.outputs.result}}"
