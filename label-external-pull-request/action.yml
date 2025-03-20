@@ -21,7 +21,7 @@ runs:
           return github.rest.teams.getMembershipForUserInOrg({
             org: context.repo.owner,
             team_slug: "external-collaborators",
-            username: ${{github.actor}}
+            username: "yongshanding"
               })
     - name: Get result
       shell: bash
