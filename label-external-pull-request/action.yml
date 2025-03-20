@@ -12,13 +12,15 @@ runs:
       run: |
             if [ '${{ github.event.pull_request.head.repo.fork}}'=='false' ]; then 
                 gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"; 
-            fi 
+            elif [${{steps.set-result.outputs.result}}==true]; then
+                gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"; 
+            fi
     
     - uses: actions/github-script@v7
       id: set-result
       with: #/orgs/PennyLaneAI/teams/external-collaborators/members
         script: |
-          return github.rest.teams.getMembershipForUserInOrg({
+          return github.rest.teams.memberships({
             org: context.repo.owner,
             team_slug: "external-collaborators",
             username: "ertyhj"
