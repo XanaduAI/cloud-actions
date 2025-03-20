@@ -5,7 +5,7 @@ description: Checks if a PR is a fork and applies an external label accordingly
 runs:
   using: composite
   steps:
-    - name: Check if fork
+    - name: Check if fork and label
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
