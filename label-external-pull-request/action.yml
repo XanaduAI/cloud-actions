@@ -26,4 +26,4 @@ runs:
         result-encoding: json
     - name: Get result
       shell: bash
-      run: echo "${{ github.actor }} ${{steps.set-result.outputs.result.data.user.login}} ${{steps.set-result.outputs.result.data.user.organizations_url}}"
+      run: echo "${{ github.actor }} ${{steps.set-result.outputs.result.data.user.login}} ${{steps.set-result.outputs.result.data.user.url}}"
