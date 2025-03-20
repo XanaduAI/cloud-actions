@@ -25,4 +25,6 @@ runs:
               })
     - name: Get result
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       run: gh api /orgs/${{context.repo.owner}}/teams/external-collaborators/memberships/${{ github.actor }}
