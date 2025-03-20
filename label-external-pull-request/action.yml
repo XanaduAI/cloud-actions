@@ -18,9 +18,10 @@ runs:
       id: set-result
       with: #/orgs/PennyLaneAI/teams/external-collaborators/members
         script: |
-          return github.rest.teams.listMembersInOrg({
-            org: "PennyLaneAI",
+          return github.rest.teams.getMembershipForUserInOrg({
+            org: context.repo.owner,
             team_slug: "external-collaborators",
+            username: ${{github.actor}}
               })
     - name: Get result
       shell: bash
