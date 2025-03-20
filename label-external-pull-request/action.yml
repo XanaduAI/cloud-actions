@@ -23,7 +23,7 @@ runs:
           return github.rest.teams.getMembership({
             org: context.repo.owner,
             team_slug: "external-collaborators",
-            username: ${{ github.actor }}
+            username: "runora95"
               })
     - name: Get result
       shell: bash
