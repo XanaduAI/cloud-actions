@@ -12,8 +12,6 @@ runs:
       run: |
             if [ '${{ github.event.pull_request.head.repo.fork}}'=='false' ]; then 
                 gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"; 
-            elif [${{steps.set-result.outputs.result}}==true]; then
-                gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"; 
             fi
     
     - uses: actions/github-script@v7
@@ -27,4 +25,7 @@ runs:
               })
     - name: Get result
       shell: bash
-      run: echo "${{ github.actor }} ${{steps.set-result.outputs.result}}"
+      run: gh api \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          /orgs/${{context.repo.owner}}/teams/external-collaborators/memberships/${{ github.actor }}
