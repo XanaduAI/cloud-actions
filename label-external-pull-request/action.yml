@@ -16,19 +16,22 @@ runs:
     
     - uses: actions/github-script@v7
       id: set-result
-      with: #/orgs/PennyLaneAI/teams/external-collaborators/members
+      with: 
         script: |
-          const result = github.rest.teams.getMembershipForUserInOrg({
-            org: context.repo.owner,
-            team_slug: "external-collaborators",
-            username: ${{ github.actor }}
-              });
-          return result.data.state;
+          try {
+            const result = github.rest.teams.getMembershipForUserInOrg({
+              org: context.repo.owner,
+              team_slug: "external-collaborators",
+              username: ${{ github.actor }},
+                });
+            return result.data.state;
+            } 
+          catch (error) {
+            return "error could not do this";
+          }
     - name: Get result
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
-      run: |
-            gh api -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28"  \
-            /orgs/PennyLaneAI/teams/external-collaborators/memberships/${{ github.actor }}
+      run: echo "result is ${{ steps.set-result.outputs.result }}"
+            
