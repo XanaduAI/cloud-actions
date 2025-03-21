@@ -33,7 +33,7 @@ runs:
         github-token: ${{ inputs.github_token }}
         script: |
           const response = await github.rest.teams.getMembershipForUserInOrg({
-            org: context.repo.owner,
+            org: inputs.org,
             team_slug: inputs.team,
             username: inputs.username,
           });
@@ -41,7 +41,7 @@ runs:
     - name: Get result
       shell: bash
       run: |
-        if [ "{{ steps.set-result.outputs.result }}" == "200"]; then
+        if [ '{{ steps.set-result.outputs.result }}' == '200']; then
             gh pr edit ${{github.event.pull_request.html_url}} --add-label "external";
         fi && echo "Done"
             
