@@ -1,0 +1,51 @@
+name: Label External Pull Requests
+description: Checks if a PR is a fork and applies an external label accordingly
+
+inputs:
+  github_token:
+    description: The GitHub token to use read member status
+    required: true
+  team:
+    description: The team slug for external collaborators
+    required: true
+  org:
+    description: The organization to check membership in
+    required: true
+  username:
+    description: The username to check membership for
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Check if fork and label
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+            if [ '${{ github.event.pull_request.head.repo.fork}}'=='false' ]; then 
+                gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"; 
+            fi
+    
+    - uses: actions/github-script@v7
+      id: set-result
+      with: 
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const response = await github.rest.teams.getMembershipForUserInOrg({
+            org: inputs.org,
+            team_slug: inputs.team,
+            username: inputs.username,
+          });
+          return response.status;
+    - name: Get result
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
+      run: |
+        stat = "${{ steps.set-result.outputs.result }}"
+        if [ "$stat" == "200" ]; then
+            gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"
+        fi
+        echo "Done"
+            
