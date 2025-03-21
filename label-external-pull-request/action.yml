@@ -37,7 +37,7 @@ runs:
               team_slug: "${{ inputs.team }}",
               username: "${{ inputs.username }}",
                 });
-            return result.data.state
+            return result;
             
     - name: Get result
       shell: bash
