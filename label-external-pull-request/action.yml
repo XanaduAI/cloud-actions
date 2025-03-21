@@ -18,7 +18,7 @@ runs:
     - name: Check if fork and label
       shell: bash
       env:
-        GITHUB_TOKEN: ${{ github.token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
       run: |
             if [ '${{ github.event.pull_request.head.repo.fork}}'=='false' ]; then 
                 gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"; 
