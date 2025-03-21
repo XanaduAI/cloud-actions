@@ -37,7 +37,7 @@ runs:
             team_slug: inputs.team,
             username: inputs.username,
           });
-          setOutput("result", response.status);
+          return response.status;
     - name: Get result
       shell: bash
       run: |
