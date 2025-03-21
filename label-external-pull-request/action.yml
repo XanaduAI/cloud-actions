@@ -33,7 +33,7 @@ runs:
         github-token: ${{ github.token }}
         script: |
             const result = github.rest.teams.getMembershipForUserInOrg({
-              org: "${{ inputs.org }}",
+              org: context.repo.owner,
               team_slug: "${{ inputs.team }}",
               username: "${{ inputs.username }}",
                 });
