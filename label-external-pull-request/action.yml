@@ -2,7 +2,7 @@ name: Label External Pull Requests
 description: Checks if a PR is a fork and applies an external label accordingly
 
 inputs:
-  git_read_member:
+  github_token:
     description: The GitHub token to use read member status
     required: true
   team:
