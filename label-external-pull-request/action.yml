@@ -34,11 +34,14 @@ runs:
         script: |
           const response = await github.rest.teams.getMembershipForUserInOrg({
             org: context.repo.owner,
-            team_slug: "${{ inputs.team }}",
-            username: "${{ inputs.username }}",
+            team_slug: inputs.team,
+            username: inputs.username,
           });
-          return response.status;
+          core.setOutput("result", response.status);
     - name: Get result
       shell: bash
-      run: echo "result is ${{ steps.set-result.outputs.result }}"
+      run: |
+        if [ "{{ steps.set-result.outputs.result }}" == "200"]; then
+            gh pr edit ${{github.event.pull_request.html_url}} --add-label "external";
+        fi && echo "Done"
             
