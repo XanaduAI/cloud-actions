@@ -18,17 +18,13 @@ runs:
       id: set-result
       with: 
         script: |
-          try {
             const result = github.rest.teams.getMembershipForUserInOrg({
               org: context.repo.owner,
               team_slug: "external-collaborators",
-              username: ${{ github.actor }},
+              username: "${{ github.actor }}",
                 });
             return result.data.state;
-            } 
-          catch (error) {
-            return "error could not do this+ ${error}";
-          }
+            
     - name: Get result
       shell: bash
       env:
