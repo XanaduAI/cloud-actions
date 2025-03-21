@@ -27,4 +27,4 @@ runs:
       shell: bash
       env:
         GITHUB_TOKEN: ${{ github.token }}
-      run: gh api /orgs/PennyLaneAI/teams/external-collaborators/memberships/${{ github.actor }}
+      run: echo "${{steps.set-result.outputs.result}}"
