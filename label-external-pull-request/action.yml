@@ -27,7 +27,7 @@ runs:
             return result.data.state;
             } 
           catch (error) {
-            return "error could not do this";
+            return "error could not do this+ ${error}";
           }
     - name: Get result
       shell: bash
