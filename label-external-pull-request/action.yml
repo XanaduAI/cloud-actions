@@ -40,8 +40,12 @@ runs:
           return response.status;
     - name: Get result
       shell: bash
+      env:
+        GITHUB_TOKEN: ${{ github.token }}
       run: |
-        if [ '{{ steps.set-result.outputs.result }}' == '200']; then
-            gh pr edit ${{github.event.pull_request.html_url}} --add-label "external";
-        fi && echo "Done"
+        stat = "${{ steps.set-result.outputs.result }}"
+        if [ "$stat" == "200" ]; then
+            gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"
+        fi
+        echo "Done"
             
