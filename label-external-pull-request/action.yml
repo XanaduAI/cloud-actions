@@ -30,7 +30,7 @@ runs:
     - uses: actions/github-script@v7
       id: set-result
       with: 
-        github-token: ${{ inputs.github_token }}
+        github-token: ${{ inputs.GITHUB_TOKEN }}
         script: |
             const result = github.rest.teams.getMembershipForUserInOrg({
               org: context.repo.owner,
