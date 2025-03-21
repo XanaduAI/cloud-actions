@@ -32,13 +32,12 @@ runs:
       with: 
         github-token: ${{ inputs.github_token }}
         script: |
-            const result = github.rest.teams.getMembershipForUserInOrg({
-              org: context.repo.owner,
-              team_slug: "${{ inputs.team }}",
-              username: "${{ inputs.username }}",
-                });
-            return result.status;
-            
+          const response = await github.rest.teams.getMembershipForUserInOrg({
+            org: context.repo.owner,
+            team_slug: "${{ inputs.team }}",
+            username: "${{ inputs.username }}",
+          });
+          return response.status;
     - name: Get result
       shell: bash
       run: echo "result is ${{ steps.set-result.outputs.result }}"
