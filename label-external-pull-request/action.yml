@@ -11,6 +11,9 @@ inputs:
   org:
     description: The organization to check membership in
     required: true
+  username:
+    description: The username to check membership for
+    required: true
 
 runs:
   using: composite
@@ -32,7 +35,7 @@ runs:
             const result = github.rest.teams.getMembershipForUserInOrg({
               org: "${{ inputs.org }}",
               team_slug: "${{ inputs.team }}",
-              username: "${{ inputs.git_read_member }}",
+              username: "${{ inputs.username }}",
                 });
             return result.data.state;
             
