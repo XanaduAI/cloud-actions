@@ -37,7 +37,7 @@ runs:
             team_slug: inputs.team,
             username: inputs.username,
           });
-          return response.status;
+          return response.data.state === 'active';
     - name: Get result
       shell: bash
       env:
