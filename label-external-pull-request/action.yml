@@ -5,13 +5,13 @@ inputs:
   github_token:
     description: The GitHub token to use read member status
     required: true
-  team:
+  github_team:
     description: The team slug for external collaborators
     required: true
-  org:
+  github_organization:
     description: The organization to check membership in
     required: true
-  username:
+  github_username:
     description: The username to check membership for
     required: true
 
@@ -21,15 +21,15 @@ runs:
     - uses: actions/github-script@v7
       id: set-result
       env:
-         GITHUB_ORG: ${{ inputs.org }}
-         GITHUB_TEAM_SLUG: ${{ inputs.team }}
-         GITHUB_USERNAME: ${{ inputs.username }}
+         GITHUB_ORGANIZATION: ${{ inputs.github_organization }}
+         GITHUB_TEAM_SLUG: ${{ inputs.github_team }}
+         GITHUB_USERNAME: ${{ inputs.github_username }}
       with: 
         github-token: ${{ inputs.github_token }}
         result-encoding: string
         script: |
           const response = await github.rest.teams.getMembershipForUserInOrg({
-            org: process.env.GITHUB_ORG,
+            org: process.env.GITHUB_ORGANIZATION,
             team_slug: process.env.GITHUB_TEAM_SLUG,
             username: process.env.GITHUB_USERNAME,
           });
