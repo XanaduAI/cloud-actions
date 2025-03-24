@@ -38,14 +38,7 @@ runs:
             username: inputs.username,
           });
           return response.data.state === 'active';
-    - name: Get result
-      shell: bash
-      env:
-        GITHUB_TOKEN: ${{ github.token }}
-      run: |
-        stat = "${{ steps.set-result.outputs.result }}"
-        if [ "$stat" == "200" ]; then
-            gh pr edit ${{github.event.pull_request.html_url}} --add-label "external"
-        fi
-        echo "Done"
+    - name: Add label
+      if: github.event.pull_request.head.repo.fork == true || steps.set-result.outputs.result == 'true'
+      run: gh pr edit ${{ github.event.pull_request.html_url }} --add-label "external"
             
