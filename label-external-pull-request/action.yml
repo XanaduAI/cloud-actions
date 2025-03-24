@@ -24,9 +24,9 @@ runs:
         github-token: ${{ inputs.github_token }}
         script: |
           const response = await github.rest.teams.getMembershipForUserInOrg({
-            org: inputs.org,
-            team_slug: inputs.team,
-            username: inputs.username,
+            org: "${{ inputs.org }}",
+            team_slug: "${{ inputs.team }}",
+            username: "${{ inputs.username }}",
           });
           return response.data.state === 'active';
     - name: Add label
