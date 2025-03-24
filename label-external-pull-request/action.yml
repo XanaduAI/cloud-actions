@@ -26,7 +26,7 @@ runs:
           const response = await github.rest.teams.getMembershipForUserInOrg({
             org: "${{ inputs.org }}",
             team_slug: "${{ inputs.team }}",
-            username: "${{ inputs.username }}",
+            username: "yongshanding",
           });
           return response.data.state === 'active';
     - name: Add label
