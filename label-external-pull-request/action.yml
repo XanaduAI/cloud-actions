@@ -9,10 +9,10 @@ inputs:
     description: The team slug for external collaborators
     required: true
   github_organization:
-    description: The organization to check membership in
+    description: The organization to check membership
     required: true
   github_username:
-    description: The username to check membership for
+    description: The username to check membership 
     required: true
 
 runs:
