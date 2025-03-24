@@ -20,13 +20,18 @@ runs:
   steps:
     - uses: actions/github-script@v7
       id: set-result
+      env:
+         GITHUB_ORG: ${{ inputs.org }}
+         GITHUB_TEAM_SLUG: ${{ inputs.team }}
+         GITHUB_USERNAME: ${{ inputs.username }}
       with: 
         github-token: ${{ inputs.github_token }}
+        result-encoding: string
         script: |
           const response = await github.rest.teams.getMembershipForUserInOrg({
-            org: "${{ inputs.org }}",
-            team_slug: "${{ inputs.team }}",
-            username: "${{ inputs.username }}",
+            org: process.env.GITHUB_ORG,
+            team_slug: process.env.GITHUB_TEAM_SLUG,
+            username: process.env.GITHUB_USERNAME,
           });
           return response.data.state === 'active';
     - name: Add label
