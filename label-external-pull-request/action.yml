@@ -28,18 +28,17 @@ runs:
         github-token: ${{ inputs.github_token }}
         result-encoding: string
         script: |
-          if ((await github.rest.teams.getMembershipForUser({
-            org: process.env.GITHUB_ORGANIZATION,
-            username: process.env.GITHUB_USERNAME,
-            })).data.state === 'active') {
-            return false;
-            if ((await github.rest.teams.getMembershipForUserInOrg({
+          if ((await github.rest.orgs.getMembershipForUser({
               org: process.env.GITHUB_ORGANIZATION,
-              team_slug: process.env.GITHUB_TEAM_SLUG,
               username: process.env.GITHUB_USERNAME,
               })).data.state === 'active') {
-              return true;
-            }
+                if ((await github.rest.teams.getMembershipForUserInOrg({
+                  org: process.env.GITHUB_ORGANIZATION,
+                  team_slug: process.env.GITHUB_TEAM_SLUG,
+                  username: process.env.GITHUB_USERNAME,
+                  })).data.state === 'active') {
+                  return true;
+                }
             return false;
           } 
     - name: Add label
