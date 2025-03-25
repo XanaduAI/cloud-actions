@@ -46,6 +46,6 @@ runs:
       env:
         PR_HTML_URL: ${{ github.event.pull_request.html_url }}
         GITHUB_TOKEN: ${{ github.token }}
-      if: github.event.pull_request.head.repo.fork == true || steps.set-result.outputs.result == 'active'
+      if: github.event.pull_request.head.repo.fork == true || steps.set-result.outputs.result == 'true'
       run: gh pr edit "$PR_HTML_URL" --add-label "external"
             
