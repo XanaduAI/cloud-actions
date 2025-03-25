@@ -33,13 +33,14 @@ runs:
             username: process.env.GITHUB_USERNAME,
             })).data.state === 'active') {
             return false;
-          }
-          else if ((await github.rest.teams.getMembershipForUserInOrg({
-            org: process.env.GITHUB_ORGANIZATION,
-            team_slug: process.env.GITHUB_TEAM_SLUG,
-            username: process.env.GITHUB_USERNAME,
-            })).data.state === 'active') {
-            return true;
+            if ((await github.rest.teams.getMembershipForUserInOrg({
+              org: process.env.GITHUB_ORGANIZATION,
+              team_slug: process.env.GITHUB_TEAM_SLUG,
+              username: process.env.GITHUB_USERNAME,
+              })).data.state === 'active') {
+              return true;
+            }
+            return false;
           } 
     - name: Add label
       shell: bash
