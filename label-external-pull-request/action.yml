@@ -28,24 +28,24 @@ runs:
         github-token: ${{ inputs.github_token }}
         result-encoding: string
         script: |
-          if ((await github.rest.orgs.getMembershipForUser({
+          try {
+            const response = await github.rest.teams.getMembershipForUserInOrg({
               org: process.env.GITHUB_ORGANIZATION,
+              team_slug: process.env.GITHUB_TEAM_SLUG,
               username: process.env.GITHUB_USERNAME,
-              })).data.state === 'active') {
-                if ((await github.rest.teams.getMembershipForUserInOrg({
-                  org: process.env.GITHUB_ORGANIZATION,
-                  team_slug: process.env.GITHUB_TEAM_SLUG,
-                  username: process.env.GITHUB_USERNAME,
-                  })).data.state === 'active') {
-                  return true;
-                }
-            return false;
-          } 
+            });
+            return response.data.state === 'active';
+          } catch (error) {
+            if (error.status === 404) {
+              return false;
+            }
+            throw error;
+          }
     - name: Add label
       shell: bash
       env:
         PR_HTML_URL: ${{ github.event.pull_request.html_url }}
         GITHUB_TOKEN: ${{ github.token }}
-      if: github.event.pull_request.head.repo.fork == true || steps.set-result.outputs.result == 'true'
+      if: github.event.pull_request.head.repo.fork == true || steps.set-result.outputs.result == 'active'
       run: gh pr edit "$PR_HTML_URL" --add-label "external"
             
