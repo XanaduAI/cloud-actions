@@ -28,12 +28,19 @@ runs:
         github-token: ${{ inputs.github_token }}
         result-encoding: string
         script: |
-          const response = await github.rest.teams.getMembershipForUserInOrg({
-            org: process.env.GITHUB_ORGANIZATION,
-            team_slug: process.env.GITHUB_TEAM_SLUG,
-            username: process.env.GITHUB_USERNAME,
-          });
-          return response.data.state === 'active';
+          try {
+            const response = await github.rest.teams.getMembershipForUserInOrg({
+              org: process.env.GITHUB_ORGANIZATION,
+              team_slug: process.env.GITHUB_TEAM_SLUG,
+              username: process.env.GITHUB_USERNAME,
+            });
+            return response.data.state === 'active';
+          } catch (error) {
+            if (error.status === 404) {
+              return false;
+            }
+            throw error;
+          }
     - name: Add label
       shell: bash
       env:
