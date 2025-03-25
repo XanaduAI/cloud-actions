@@ -23,7 +23,7 @@ runs:
       env:
          GITHUB_ORGANIZATION: ${{ inputs.github_organization }}
          GITHUB_TEAM_SLUG: ${{ inputs.github_team }}
-         GITHUB_USERNAME: "yongshanding"
+         GITHUB_USERNAME: ${{ inputs.github_username }}
       with: 
         github-token: ${{ inputs.github_token }}
         result-encoding: string
