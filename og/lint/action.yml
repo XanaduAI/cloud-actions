@@ -44,20 +44,23 @@ runs:
           files_to_format = edited_py_files - ignore_files
 
           if files_to_format := " ".join(map(str, files_to_format)):
-            print("Running black...", flush=True)
-            subprocess.run(f"black {files_to_format}", shell=True, check=True)
-            print("Running isort...", flush=True)
-            subprocess.run(f"isort --profile=black {files_to_format}", shell=True)
-            print("Running docformatter", flush=True)
-            if (
+            try:
+              print("Running black...", flush=True)
+              subprocess.run(f"black {files_to_format}", shell=True, check=True)
+              print("Running isort...", flush=True)
+              subprocess.run(f"isort --profile=black {files_to_format}", shell=True)
+              print("Running docformatter", flush=True)
+              if (
+                subprocess.run(
+                  f"docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 {files_to_format}",
+                  shell=True,
+                ).returncode
+                == 3
+              ):
+                print("Docformatter raised status 3", flush=True)
+              print("Running flake8", flush=True)
               subprocess.run(
-                f"docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 {files_to_format}",
-                shell=True,
-              ).returncode
-              == 3
-            ):
-              print("Docformatter raised status 3", flush=True)
-            print("Running flake8", flush=True)
-            subprocess.run(
-              f"flake8 --ignore=E203,E501,W503 {files_to_format}", shell=True, check=True
-            )
+                f"flake8 --ignore=E203,E501,W503 {files_to_format}", shell=True, check=True
+              )
+            finally:
+              print("Ling action finished!", flush=True)
