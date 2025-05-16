@@ -43,7 +43,7 @@ runs:
 
           if files_to_format := " ".join(map(str, files_to_format)):
             print("Running black...")
-            subprocess.run(f"black {files_to_format}", shell=True)
+            subprocess.run(f"black {files_to_format}", shell=True, check=True)
             print("Running isort...")
             subprocess.run(f"isort --profile=black {files_to_format}", shell=True)
             print("Running docformatter")
