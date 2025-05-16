@@ -60,5 +60,6 @@ runs:
               subprocess.run(
                 f"flake8 --ignore=E203,E501,W503 {files_to_format}", shell=True, check=True
               )
-            finally:
-              print("Ling action finished!", flush=True)
+            except Exception:
+              print("Lint action finished with an exception:", flush=True)
+              raise
