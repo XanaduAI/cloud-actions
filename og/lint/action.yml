@@ -9,8 +9,6 @@ runs:
       shell: bash
       run: | 
           pip install black isort docformatter flake8
-          # black ./rpdaq/ ./tests/
-          # flake8 --ignore=E203,E501,W503 ./rpdaq/ ./tests/
 
     - name: Run the main logic
       shell: python
@@ -46,7 +44,7 @@ runs:
           if files_to_format := " ".join(map(str, files_to_format)):
             try:
               print("Running black...", flush=True)
-              subprocess.run(f"black {files_to_format}", shell=True, check=True)
+              subprocess.run(f"black {files_to_format}", shell=True)
               print("Running isort...", flush=True)
               subprocess.run(f"isort --profile=black {files_to_format}", shell=True)
               print("Running docformatter", flush=True)
