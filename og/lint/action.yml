@@ -58,7 +58,7 @@ runs:
                 print("Docformatter raised status 3", flush=True)
               print("Running flake8", flush=True)
               subprocess.run(
-                f"flake8 --ignore=E203,E501,W503 {files_to_format}", shell=True, check=True
+                f"flake8 --ignore=E203,E226,E227,E501,W503, {files_to_format}", shell=True, check=True
               )
             except Exception:
               print("Lint action finished with an exception:", flush=True)
