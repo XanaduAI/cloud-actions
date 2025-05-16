@@ -9,8 +9,8 @@ runs:
       shell: bash
       run: | 
           pip install black isort docformatter flake8
-          black ./rpdaq/ ./tests/
-          flake8 --ignore=E203,E501,W503 ./rpdaq/ ./tests/
+          # black ./rpdaq/ ./tests/
+          # flake8 --ignore=E203,E501,W503 ./rpdaq/ ./tests/
 
     - name: Run the main logic
       shell: python
@@ -44,11 +44,11 @@ runs:
           files_to_format = edited_py_files - ignore_files
 
           if files_to_format := " ".join(map(str, files_to_format)):
-            print("Running black...")
+            print("Running black...", flush=True)
             subprocess.run(f"black {files_to_format}", shell=True, check=True)
-            print("Running isort...")
+            print("Running isort...", flush=True)
             subprocess.run(f"isort --profile=black {files_to_format}", shell=True)
-            print("Running docformatter")
+            print("Running docformatter", flush=True)
             if (
               subprocess.run(
                 f"docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 {files_to_format}",
@@ -56,8 +56,8 @@ runs:
               ).returncode
               == 3
             ):
-              print("Docformatter raised status 3")
-            print("Running flake8")
+              print("Docformatter raised status 3", flush=True)
+            print("Running flake8", flush=True)
             subprocess.run(
-              f"flake8 --ignore=E203,E501,W503 {files_to_format}", shell=True, check=not True
+              f"flake8 --ignore=E203,E501,W503 {files_to_format}", shell=True, check=True
             )
