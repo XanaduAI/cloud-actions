@@ -8,7 +8,7 @@ runs:
     - name: Install dependencies
       shell: bash
       run: | 
-          pip install black isort docformatter==1.7.7 flake8
+          pip install ruff flake8
 
     - name: Run the main logic
       shell: python
@@ -43,19 +43,9 @@ runs:
 
           if files_to_format := " ".join(map(str, files_to_format)):
             try:
-              print("Running black...", flush=True)
-              subprocess.run(f"black {files_to_format}", shell=True)
-              print("Running isort...", flush=True)
-              subprocess.run(f"isort --profile=black {files_to_format}", shell=True)
-              print("Running docformatter", flush=True)
-              if (
-                subprocess.run(
-                  f"docformatter --recursive --in-place --wrap-summaries 88 --wrap-descriptions 88 {files_to_format}",
-                  shell=True,
-                ).returncode
-                == 3
-              ):
-                print("Docformatter raised status 3", flush=True)
+              print("Running ruff...", flush=True)
+              subprocess.run(f"ruff format {files_to_format}", shell=True)
+
               print("Running flake8", flush=True)
               subprocess.run(
                 f"flake8 --ignore=E203,E226,E227,E501,W503, {files_to_format}", shell=True, check=True
